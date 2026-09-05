@@ -1,169 +1,93 @@
-.page-header {
-  margin-bottom: 32px;
-}
-
 .page-title {
   font-size: 2rem;
-  font-weight: 800;
-  color: #fff;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  margin-bottom: 8px;
-}
-
-.page-subtitle {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 400;
-}
-
-.config-form {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-}
-
-.form-section {
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  padding: 24px;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.section-title {
-  font-size: 1.125rem;
   font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 20px 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  margin-bottom: 2rem;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-}
-
-.form-row {
-  margin-bottom: 16px;
-}
-
-.form-group {
+.form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 1.5rem;
 }
-
-.form-label {
+label {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  color: #475569;
-}
-
-.label-icon {
-  font-size: 1.125rem;
-}
-
-.form-input {
-  border: 2px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 0.9375rem;
-  transition: all 0.2s;
-  background: #fff;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
   font-weight: 500;
-  color: #475569;
 }
-
-.checkbox-input {
+input[type="text"],
+input[type="password"] {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  transition: all 0.2s;
+}
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.checkbox-row input[type="checkbox"] {
   width: 20px;
   height: 20px;
-  cursor: pointer;
+  accent-color: var(--accent-primary);
 }
-
-.checkbox-text {
-  font-size: 1rem;
-}
-
-.form-actions {
+.actions {
   display: flex;
-  gap: 12px;
-  padding-top: 8px;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .success-msg {
+  margin-top: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 0.75rem;
+  color: var(--success);
+  font-weight: 500;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-  border-radius: 12px;
-  color: #059669;
-  font-weight: 600;
-  border: 1px solid #6ee7b7;
+  gap: 0.75rem;
 }
-
-.success-icon {
+.success-msg::before {
+  content: '\F26A';
+  font-family: 'bootstrap-icons';
   font-size: 1.25rem;
 }
-
-.loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 40px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e2e8f0;
-  border-top-color: #3b82f6;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-state p {
-  color: #64748b;
-  font-weight: 500;
-}
-
 .error-msg {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.75rem;
+  color: var(--danger);
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-  padding: 16px 20px;
-  background: linear-gradient(135deg, #fee2e2, #fecaca);
-  border-radius: 12px;
-  color: #dc2626;
-  font-weight: 600;
-  border: 1px solid #fca5a5;
+  gap: 0.75rem;
 }
-
-.error-icon {
+.error-msg::before {
+  content: '\F338';
+  font-family: 'bootstrap-icons';
   font-size: 1.25rem;
 }
