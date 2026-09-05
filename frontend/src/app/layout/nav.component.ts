@@ -18,15 +18,10 @@ import { MqttService } from '../../services/mqtt.service';
           <i class="bi bi-speedometer2 text-2xl"></i>
           <span>Dashboard</span>
         </a>
-        <a routerLink="/devices" routerLinkActive="active" 
-           class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
-          <i class="bi bi-cpu text-2xl"></i>
-          <span>&Eacute;quipements</span>
-        </a>
         <a routerLink="/system" routerLinkActive="active" 
            class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
-          <i class="bi bi-pc-display text-2xl"></i>
-          <span>Syst&egrave;me</span>
+          <i class="bi bi-cpu text-2xl"></i>
+          <span>Systè§°me</span>
         </a>
         <a routerLink="/config" routerLinkActive="active" 
            class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
@@ -52,7 +47,7 @@ import { MqttService } from '../../services/mqtt.service';
              [class.text-green-400]="mqttConnected()">
           <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
                 [class.shadow-[0_0_10px_#10b981]]="mqttConnected()"></span>
-          <span>{{ mqttConnected() ? 'MQTT connect&eacute;' : 'En ligne (HTTP)' }}</span>
+          <span>{{ mqttConnected() ? 'MQTT connecté' : 'En ligne (HTTP)' }}</span>
         </div>
       </div>
     </nav>
