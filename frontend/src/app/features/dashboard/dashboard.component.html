@@ -1,97 +1,161 @@
-<div class="flex justify-between items-center mb-8 p-6 glass-card animate-fade-in">
-  <h1 class="flex items-center gap-4 text-4xl font-bold m-0 gradient-text">
-    <i class="bi bi-water text-5xl"></i>
+<div class="dashboard-header animate-fade-in">
+  <h1 class="page-title">
+    <i class="bi bi-water"></i>
     <span>Dashboard Piscine</span>
   </h1>
-  <div class="flex gap-4">
-    <button class="w-12 h-12 rounded-full bg-primary-500/10 border-2 border-primary-500/30 text-primary-500 flex items-center justify-center cursor-pointer transition-all duration-200 text-2xl hover:bg-primary-500/20 hover:border-primary-500 hover:rotate-90" (click)="load()" [class.animate-spin]="loading()">
+  <div class="header-actions">
+    <div class="connection-badge" *ngIf="mqttConnected()">
+      <i class="bi bi-wifi"></i>
+      <span>MQTT</span>
+    </div>
+    <button class="btn-refresh" (click)="load()" [class.loading]="loading()">
       <i class="bi bi-arrow-clockwise"></i>
     </button>
   </div>
 </div>
 
-<div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 mb-8 animate-fade-in" style="animation-delay: 0.1s">
-  <flow-card *ngIf="status(); else loadingTpl">
-    <flow-stat-card label="Tempé¬°rature" unit=" °C">
+<!-- System Status -->
+<flow-card *ngIf="system()" title="Syst&egrave;me" class="animate-fade-in">
+  <div class="system-grid">
+    <div class="system-stat">
+      <i class="bi bi-clock"></i>
+      <span>{{ (system()!.uptime / 3600) | number:'1.0-1' }}h</span>
+      <small>Uptime</small>
+    </div>
+    <div class="system-stat">
+      <i class="bi bi-memory"></i>
+      <span>{{ ((system()!.freeMemory / system()!.totalMemory) * 100) | number:'1.0-0' }}%</span>
+      <small>M&eacute;moire</small>
+    </div>
+    <div class="system-stat">
+      <i class="bi bi-reception-4"></i>
+      <span>{{ system()!.wifiRssi }} dBm</span>
+      <small>WiFi</small>
+    </div>
+  </div>
+</flow-card>
+
+<!-- Pool Status -->
+<div class="stats-grid animate-fade-in" style="animation-delay: 0.1s">
+  <flow-card *ngIf="status() || chemistry()">
+    <flow-stat-card label="Temp&eacute;rature" unit=" &deg;C">
       {{ temperature() | temperature }}
     </flow-stat-card>
   </flow-card>
-  <flow-card *ngIf="status(); else loadingTpl">
+  <flow-card *ngIf="status() || chemistry()">
     <flow-stat-card label="pH">
       {{ ph() ?? '–' }}
     </flow-stat-card>
   </flow-card>
-  <flow-card *ngIf="status(); else loadingTpl">
+  <flow-card *ngIf="status() || chemistry()">
     <flow-stat-card label="ORP" unit="mV">
       {{ orp() ?? '–' }}
     </flow-stat-card>
   </flow-card>
 </div>
 
-<flow-card title="É§quipements" class="animate-fade-in" style="animation-delay: 0.2s">
-  <div class="flex flex-col gap-4" *ngIf="status(); else loadingTpl2">
-    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
-      <div class="flex items-center gap-4">
-        <i class="bi bi-droplet-fill text-4xl gradient-text"></i>
+<!-- Temperatures -->
+<flow-card *ngIf="temperatures()" title="Temp&eacute;ratures" class="animate-fade-in" style="animation-delay: 0.2s">
+  <div class="temps-grid">
+    <div class="temp-item">
+      <i class="bi bi-thermometer-half"></i>
+      <span class="temp-name">Bassin</span>
+      <span class="temp-value">{{ temperatures()!.basin | temperature }}</span>
+    </div>
+    <div class="temp-item">
+      <i class="bi bi-arrow-return-left"></i>
+      <span class="temp-name">Retour</span>
+      <span class="temp-value">{{ temperatures()!.return | temperature }}</span>
+    </div>
+    <div class="temp-item">
+      <i class="bi bi-gear-wide-connected"></i>
+      <span class="temp-name">Local</span>
+      <span class="temp-value">{{ temperatures()!.equipment | temperature }}</span>
+    </div>
+    <div class="temp-item" *ngIf="temperatures()!.outdoor">
+      <i class="bi bi-sun"></i>
+      <span class="temp-name">Ext&eacute;rieur</span>
+      <span class="temp-value">{{ temperatures()!.outdoor | temperature }}</span>
+    </div>
+  </div>
+</flow-card>
+
+<!-- Chemistry -->
+<flow-card *ngIf="chemistry()" title="Chimie" class="animate-fade-in" style="animation-delay: 0.3s">
+  <div class="chemistry-grid">
+    <div class="chem-item">
+      <div class="chem-label">pH</div>
+      <div class="chem-value" [class.good]="chemistry()!.ph >= 7.0 && chemistry()!.ph <= 7.4" [class.bad]="chemistry()!.ph < 7.0 || chemistry()!.ph > 7.4">
+        {{ chemistry()!.ph }}
+      </div>
+    </div>
+    <div class="chem-item">
+      <div class="chem-label">ORP</div>
+      <div class="chem-value" [class.good]="chemistry()!.orp >= 650" [class.bad]="chemistry()!.orp < 650">
+        {{ chemistry()!.orp }} mV
+      </div>
+    </div>
+  </div>
+</flow-card>
+
+<!-- Equipment -->
+<flow-card title="&Eacute;quipements" class="animate-fade-in" style="animation-delay: 0.4s">
+  <div class="equipments" *ngIf="status(); else loadingTpl">
+    <div class="equipment-item">
+      <div class="equipment-info">
+        <i class="bi bi-droplet-fill"></i>
         <div>
-          <div class="font-semibold text-base text-white mb-1">Filtration</div>
-          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.filtrationOn" [class.font-semibold]="status()!.filtrationOn">
-            {{ status()!.filtrationOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          <div class="equipment-name">Filtration</div>
+          <div class="equipment-status" [class.status-on]="status()!.filtrationOn">
+            {{ status()!.filtrationOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
           </div>
         </div>
       </div>
       <flow-button variant="primary" (clicked)="toggleFiltration()">
         <i class="bi" [class.bi-play-fill]="!status()!.filtrationOn" [class.bi-stop-fill]="status()!.filtrationOn"></i>
-        {{ status()!.filtrationOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+        {{ status()!.filtrationOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
       </flow-button>
     </div>
-    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
-      <div class="flex items-center gap-4">
-        <i class="bi bi-flask text-4xl gradient-text"></i>
+    <div class="equipment-item">
+      <div class="equipment-info">
+        <i class="bi bi-flask"></i>
         <div>
-          <div class="font-semibold text-base text-white mb-1">Dosage chlore</div>
-          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.chlorineDosingOn" [class.font-semibold]="status()!.chlorineDosingOn">
-            {{ status()!.chlorineDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          <div class="equipment-name">Dosage chlore</div>
+          <div class="equipment-status" [class.status-on]="status()!.chlorineDosingOn">
+            {{ status()!.chlorineDosingOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
           </div>
         </div>
       </div>
       <flow-button variant="primary" (clicked)="toggleChlorine()">
         <i class="bi" [class.bi-play-fill]="!status()!.chlorineDosingOn" [class.bi-stop-fill]="status()!.chlorineDosingOn"></i>
-        {{ status()!.chlorineDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+        {{ status()!.chlorineDosingOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
       </flow-button>
     </div>
-    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
-      <div class="flex items-center gap-4">
-        <i class="bi bi-ph-down text-4xl gradient-text"></i>
+    <div class="equipment-item">
+      <div class="equipment-info">
+        <i class="bi bi-ph-down"></i>
         <div>
-          <div class="font-semibold text-base text-white mb-1">Dosage pH-</div>
-          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.phDosingOn" [class.font-semibold]="status()!.phDosingOn">
-            {{ status()!.phDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          <div class="equipment-name">Dosage pH-</div>
+          <div class="equipment-status" [class.status-on]="status()!.phDosingOn">
+            {{ status()!.phDosingOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
           </div>
         </div>
       </div>
       <flow-button variant="primary" (clicked)="togglePh()">
         <i class="bi" [class.bi-play-fill]="!status()!.phDosingOn" [class.bi-stop-fill]="status()!.phDosingOn"></i>
-        {{ status()!.phDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+        {{ status()!.phDosingOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
       </flow-button>
     </div>
   </div>
-  <ng-template #loadingTpl2>
-    <div class="flex items-center justify-center gap-4 p-12 text-slate-400">
-      <div class="w-6 h-6 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
+  <ng-template #loadingTpl>
+    <div class="loading-state">
+      <div class="spinner"></div>
       <span>Chargement…</span>
     </div>
   </ng-template>
 </flow-card>
 
-<div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 mt-6" *ngIf="error()">
-  <i class="bi bi-exclamation-triangle text-2xl"></i>
+<div class="error-alert" *ngIf="error()">
+  <i class="bi bi-exclamation-triangle"></i>
   {{ error() }}
 </div>
-
-<ng-template #loadingTpl>
-  <div class="flex items-center justify-center gap-4 p-12 text-slate-400">
-    <div class="w-6 h-6 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
-    <span>Chargement…</span>
-  </div>
-</ng-template>

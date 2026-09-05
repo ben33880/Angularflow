@@ -6,7 +6,7 @@ import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
 import { TemperaturePipe } from '../../shared/pipes/temperature.pipe';
-import type { PoolStatus } from '../../models/flowio.models';
+import type { PoolStatus, PoolTemperatures, PoolChemistry, SystemStatus } from '../../models/flowio.models';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,25 +22,39 @@ export class DashboardComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly statusSignal = signal<PoolStatus | null>(null);
+  private readonly temperaturesSignal = signal<PoolTemperatures | null>(null);
+  private readonly chemistrySignal = signal<PoolChemistry | null>(null);
+  private readonly systemSignal = signal<SystemStatus | null>(null);
+  
   readonly status = computed(() => this.statusSignal());
+  readonly temperatures = computed(() => this.temperaturesSignal());
+  readonly chemistry = computed(() => this.chemistrySignal());
+  readonly system = computed(() => this.systemSignal());
+  
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly mqttConnected = this.mqtt.connected;
 
   readonly temperature = computed(() => this.statusSignal()?.temperature ?? null);
-  readonly ph = computed(() => this.statusSignal()?.ph ?? null);
-  readonly orp = computed(() => this.statusSignal()?.orp ?? null);
+  readonly ph = computed(() => this.chemistrySignal()?.ph ?? this.statusSignal()?.ph ?? null);
+  readonly orp = computed(() => this.chemistrySignal()?.orp ?? this.statusSignal()?.orp ?? null);
 
   constructor() {
-    // Subscribe to MQTT pool status for real-time updates
-    this.mqtt.poolStatus$.subscribe({
-      next: (status: PoolStatus) => {
-        this.statusSignal.set(status);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('[Dashboard] MQTT pool status error:', err);
-      }
+    // Subscribe to ALL MQTT topics
+    this.mqtt.poolStatus$.subscribe(status => {
+      if (status) this.statusSignal.set(status);
+    });
+    
+    this.mqtt.temperatures$.subscribe(temps => {
+      if (temps) this.temperaturesSignal.set(temps);
+    });
+    
+    this.mqtt.chemistry$.subscribe(chem => {
+      if (chem) this.chemistrySignal.set(chem);
+    });
+    
+    this.mqtt.systemStatus$.subscribe(sys => {
+      if (sys) this.systemSignal.set(sys);
     });
   }
 
@@ -54,7 +68,6 @@ export class DashboardComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
     
-    // MQTT will push updates automatically, but we can also fetch via HTTP
     if (!this.mqttConnected()) {
       this.api.getPoolStatus().subscribe({
         next: (s) => {
