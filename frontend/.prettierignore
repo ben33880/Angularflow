@@ -1,0 +1,10 @@
+# Ignore Angular build outputs
+dist/
+.angular/
+node_modules/
+
+# Ignore environment files
+src/environments/*.ts
+
+# Ignore generated files
+*.generated.ts
