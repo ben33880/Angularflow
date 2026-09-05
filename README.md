@@ -14,15 +14,15 @@ Application Angular 22+ (standalone, signals, zoneless) pour piloter un contrôl
 
 ### Dashboard
 
-![Dashboard](flowio-dashboard-mockup.png)
+![Dashboard](assets/dashboard.png)
 
 ### Configuration
 
-![Configuration](flowio-config-mockup.png)
+![Configuration](assets/config.png)
 
 ### Logs
 
-![Logs](flowio-logs-mockup.png)
+![Logs](assets/logs.png)
 
 ## Démarrage local
 
