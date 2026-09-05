@@ -7,136 +7,47 @@ import { WebsocketService } from '../../services/websocket.service';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="sidebar">
-      <div class="sidebar-brand">
-        <i class="bi bi-water"></i>
+    <nav class="w-[260px] bg-bg-secondary border-r border-white/10 flex flex-col p-6 fixed h-screen z-[100]">
+      <div class="flex items-center gap-3 text-2xl font-bold text-text-primary mb-8 pb-6 border-b border-white/10">
+        <i class="bi bi-water text-4xl bg-gradient-primary bg-clip-text" style="-webkit-text-fill-color: transparent"></i>
         <span>Flow.io</span>
       </div>
-      <div class="sidebar-menu">
-        <a routerLink="/dashboard" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-speedometer2"></i>
+      <div class="flex flex-col gap-2 flex-1">
+        <a routerLink="/dashboard" routerLinkActive="active" 
+           class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+          <i class="bi bi-speedometer2 text-2xl"></i>
           <span>Dashboard</span>
         </a>
-        <a routerLink="/config" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-gear"></i>
+        <a routerLink="/config" routerLinkActive="active" 
+           class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+          <i class="bi bi-gear text-2xl"></i>
           <span>Config</span>
         </a>
-        <a routerLink="/logs" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-journal-text"></i>
+        <a routerLink="/logs" routerLinkActive="active" 
+           class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+          <i class="bi bi-journal-text text-2xl"></i>
           <span>Logs</span>
         </a>
-        <a routerLink="/alarms" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-exclamation-triangle"></i>
+        <a routerLink="/alarms" routerLinkActive="active" 
+           class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
+          <i class="bi bi-exclamation-triangle text-2xl"></i>
           <span>Alarmes</span>
         </a>
       </div>
-      <div class="sidebar-footer">
-        <div class="status-badge" [class.ws-connected]="wsConnected()">
-          <span class="status-dot"></span>
+      <div class="pt-6 border-t border-white/10">
+        <div class="flex items-center gap-2 text-sm text-text-secondary px-3 py-2 rounded-lg bg-white/5 transition-all duration-300"
+             [class.bg-green-500/10]="wsConnected()"
+             [class.border]="wsConnected()"
+             [class.border-green-500/30]="wsConnected()"
+             [class.text-green-400]="wsConnected()">
+          <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+                [class.shadow-[0_0_10px_#10b981]]="wsConnected()"></span>
           <span>{{ wsConnected() ? 'WebSocket connecté' : 'En ligne (HTTP)' }}</span>
         </div>
       </div>
     </nav>
   `,
-  styles: [`
-    .sidebar {
-      width: 260px;
-      background: var(--bg-secondary);
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      flex-direction: column;
-      padding: 1.5rem;
-      position: fixed;
-      height: 100vh;
-      z-index: 100;
-    }
-    .sidebar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .sidebar-brand i {
-      font-size: 2rem;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .sidebar-menu {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-      flex: 1;
-    }
-    .sidebar-link {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.875rem 1rem;
-      color: var(--text-secondary);
-      text-decoration: none;
-      border-radius: 0.75rem;
-      transition: all 0.2s;
-      font-weight: 500;
-    }
-    .sidebar-link i {
-      font-size: 1.25rem;
-    }
-    .sidebar-link:hover {
-      background: rgba(59, 130, 246, 0.1);
-      color: var(--text-primary);
-    }
-    .sidebar-link.active {
-      background: var(--gradient-primary);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-    }
-    .sidebar-footer {
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .status-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      transition: all 0.3s;
-    }
-    .status-badge.ws-connected {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--success);
-    }
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--success);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-    .status-badge.ws-connected .status-dot {
-      background: var(--success);
-      box-shadow: 0 0 10px var(--success);
-    }
-    @keyframes pulse {
-      0%, 100% {
-        opacity: 1;
-      }
-      50% {
-        opacity: 0.5;
-      }
-    }
-  `],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {

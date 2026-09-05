@@ -16,48 +16,14 @@ import { NgIf } from '@angular/common';
     </div>
   `,
   styles: [`
-    .flow-card {
-      background: var(--bg-card);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-      transition: var(--transition);
-      animation: cardEnter 0.5s ease-out;
-    }
-    .flow-card:hover {
-      border-color: rgba(59, 130, 246, 0.3);
-      box-shadow: var(--shadow-lg), 0 0 20px rgba(59, 130, 246, 0.1);
-      transform: translateY(-2px);
-    }
     .flow-card-header {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid var(--border);
+      @apply mb-5;
     }
     .flow-card-title {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      @apply m-0 text-xl font-bold text-text-primary;
     }
     .flow-card-content {
-      color: var(--text-primary);
-    }
-    @keyframes cardEnter {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      @apply text-text-primary;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
