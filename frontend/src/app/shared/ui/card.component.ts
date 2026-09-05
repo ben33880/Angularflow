@@ -6,7 +6,7 @@ import { NgIf } from '@angular/common';
   standalone: true,
   imports: [NgIf],
   template: `
-    <div class="flow-card card-hover">
+    <div class="flow-card">
       <div class="flow-card-header" *ngIf="title()">
         <h3 class="flow-card-title">{{ title() }}</h3>
       </div>
@@ -17,27 +17,29 @@ import { NgIf } from '@angular/common';
   `,
   styles: [`
     .flow-card {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-      padding: 24px;
-      margin-bottom: 24px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: var(--bg-card);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .flow-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
     }
     .flow-card-header {
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid #f1f5f9;
+      margin-bottom: 1.25rem;
     }
     .flow-card-title {
       margin: 0;
       font-size: 1.25rem;
       font-weight: 700;
-      color: #1e293b;
+      color: var(--text-primary);
     }
     .flow-card-content {
-      color: #475569;
+      color: var(--text-primary);
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush

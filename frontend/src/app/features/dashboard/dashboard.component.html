@@ -1,81 +1,97 @@
-<div class="dashboard-header fade-in">
-  <h1 class="page-title">🏊 Dashboard Piscine</h1>
-  <p class="page-subtitle">Supervision en temps réel de votre installation</p>
+<div class="dashboard-header animate-fade-in">
+  <h1 class="page-title">
+    <i class="bi bi-water"></i>
+    <span>Dashboard Piscine</span>
+  </h1>
+  <div class="header-actions">
+    <button class="btn-refresh" (click)="load()" [class.loading]="loading()">
+      <i class="bi bi-arrow-clockwise"></i>
+    </button>
+  </div>
 </div>
 
-<flow-card title="📊 État de la piscine" class="fade-in">
-  <div class="stats-grid" *ngIf="status(); else loadingTpl">
-    <flow-stat-card label="Tempé¬°rature" unit=" °C" icon="🌡️">
+<div class="stats-grid animate-fade-in" style="animation-delay: 0.1s">
+  <flow-card *ngIf="status(); else loadingTpl">
+    <flow-stat-card label="Tempé¬°rature" unit=" °C">
       {{ temperature() | temperature }}
     </flow-stat-card>
-    <flow-stat-card label="pH" icon="🧪">
+  </flow-card>
+  <flow-card *ngIf="status(); else loadingTpl">
+    <flow-stat-card label="pH">
       {{ ph() ?? '–' }}
     </flow-stat-card>
-    <flow-stat-card label="ORP" unit="mV" icon="⚡">
+  </flow-card>
+  <flow-card *ngIf="status(); else loadingTpl">
+    <flow-stat-card label="ORP" unit="mV">
       {{ orp() ?? '–' }}
     </flow-stat-card>
-    <flow-stat-card label="Statut" icon="✅">
-      {{ status()!.filtrationOn ? 'Actif' : 'Inactif' }}
-    </flow-stat-card>
-  </div>
-  <ng-template #loadingTpl>
-    <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Chargement des donné­…es…</p>
-    </div>
-  </ng-template>
-</flow-card>
+  </flow-card>
+</div>
 
-<flow-card title="⚙️ É­quipements" class="fade-in">
-  <div class="equipments-grid" *ngIf="status(); else loadingTpl2">
-    <div class="equipment-card">
-      <div class="equipment-icon">💧</div>
+<flow-card title="É§quipements" class="animate-fade-in" style="animation-delay: 0.2s">
+  <div class="equipments" *ngIf="status(); else loadingTpl2">
+    <div class="equipment-item">
       <div class="equipment-info">
-        <h4>Filtration</h4>
-        <p class="equipment-status" [class.status-on]="status()!.filtrationOn" [class.status-off]="!status()!.filtrationOn">
-          {{ status()!.filtrationOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
-        </p>
+        <i class="bi bi-droplet-fill"></i>
+        <div>
+          <div class="equipment-name">Filtration</div>
+          <div class="equipment-status" [class.status-on]="status()!.filtrationOn">
+            {{ status()!.filtrationOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          </div>
+        </div>
       </div>
       <flow-button variant="primary" (clicked)="toggleFiltration()">
+        <i class="bi" [class.bi-play-fill]="!status()!.filtrationOn" [class.bi-stop-fill]="status()!.filtrationOn"></i>
         {{ status()!.filtrationOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
       </flow-button>
     </div>
-
-    <div class="equipment-card">
-      <div class="equipment-icon">🧴</div>
+    <div class="equipment-item">
       <div class="equipment-info">
-        <h4>Dosage chlore</h4>
-        <p class="equipment-status" [class.status-on]="status()!.chlorineDosingOn" [class.status-off]="!status()!.chlorineDosingOn">
-          {{ status()!.chlorineDosingOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
-        </p>
+        <i class="bi bi-flask"></i>
+        <div>
+          <div class="equipment-name">Dosage chlore</div>
+          <div class="equipment-status" [class.status-on]="status()!.chlorineDosingOn">
+            {{ status()!.chlorineDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          </div>
+        </div>
       </div>
       <flow-button variant="primary" (clicked)="toggleChlorine()">
+        <i class="bi" [class.bi-play-fill]="!status()!.chlorineDosingOn" [class.bi-stop-fill]="status()!.chlorineDosingOn"></i>
         {{ status()!.chlorineDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
       </flow-button>
     </div>
-
-    <div class="equipment-card">
-      <div class="equipment-icon">🔬</div>
+    <div class="equipment-item">
       <div class="equipment-info">
-        <h4>Dosage pH-</h4>
-        <p class="equipment-status" [class.status-on]="status()!.phDosingOn" [class.status-off]="!status()!.phDosingOn">
-          {{ status()!.phDosingOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
-        </p>
+        <i class="bi bi-ph-down"></i>
+        <div>
+          <div class="equipment-name">Dosage pH-</div>
+          <div class="equipment-status" [class.status-on]="status()!.phDosingOn">
+            {{ status()!.phDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
+          </div>
+        </div>
       </div>
       <flow-button variant="primary" (clicked)="togglePh()">
+        <i class="bi" [class.bi-play-fill]="!status()!.phDosingOn" [class.bi-stop-fill]="status()!.phDosingOn"></i>
         {{ status()!.phDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
       </flow-button>
     </div>
   </div>
   <ng-template #loadingTpl2>
     <div class="loading-state">
-      <div class="loading-spinner"></div>
-      <p>Chargement des é­quipements…</p>
+      <div class="spinner"></div>
+      <span>Chargement…</span>
     </div>
   </ng-template>
 </flow-card>
 
-<div class="error-msg" *ngIf="error()">
-  <div class="error-icon">⚠️</div>
-  <div>{{ error() }}</div>
+<div class="error-alert" *ngIf="error()">
+  <i class="bi bi-exclamation-triangle"></i>
+  {{ error() }}
 </div>
+
+<ng-template #loadingTpl>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <span>Chargement…</span>
+  </div>
+</ng-template>

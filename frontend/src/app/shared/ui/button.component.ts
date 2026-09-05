@@ -1,15 +1,15 @@
 import { Component, input, output, ChangeDetectionStrategy } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'flow-button',
   standalone: true,
-  imports: [],
+  imports: [NgIf],
   template: `
     <button
       class="flow-button"
       [class.flow-button-primary]="variant() === 'primary'"
       [class.flow-button-secondary]="variant() === 'secondary'"
-      [class.flow-button-danger]="variant() === 'danger'"
       [disabled]="disabled()"
       (click)="clicked.emit()">
       <ng-content></ng-content>
@@ -18,41 +18,49 @@ import { Component, input, output, ChangeDetectionStrategy } from '@angular/core
   styles: [`
     .flow-button {
       border: none;
-      border-radius: 10px;
-      padding: 12px 24px;
-      font-size: 0.9375rem;
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .flow-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    .flow-button:hover::before {
+      left: 100%;
     }
     .flow-button-primary {
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      background: var(--gradient-primary);
       color: #fff;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     }
     .flow-button-primary:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+      box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
     }
     .flow-button-secondary {
-      background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-      color: #475569;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .flow-button-secondary:hover:not(:disabled) {
-      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
       transform: translateY(-2px);
-    }
-    .flow-button-danger {
-      background: linear-gradient(135deg, #ef4444, #dc2626);
-      color: #fff;
-    }
-    .flow-button-danger:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
     }
     .flow-button:disabled {
       opacity: 0.5;
@@ -63,7 +71,7 @@ import { Component, input, output, ChangeDetectionStrategy } from '@angular/core
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ButtonComponent {
-  variant = input<'primary' | 'secondary' | 'danger'>('secondary');
+  variant = input<'primary' | 'secondary'>('secondary');
   disabled = input(false);
   clicked = output<void>();
 }

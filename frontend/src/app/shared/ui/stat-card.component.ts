@@ -1,12 +1,15 @@
 import { Component, input, ChangeDetectionStrategy } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'flow-stat-card',
   standalone: true,
-  imports: [],
+  imports: [NgIf],
   template: `
-    <div class="stat-card card-hover">
-      <div class="stat-icon">{{ icon() }}</div>
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="bi bi-activity"></i>
+      </div>
       <div class="stat-label">{{ label() }}</div>
       <div class="stat-value">
         <ng-content></ng-content>
@@ -16,39 +19,64 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
   `,
   styles: [`
     .stat-card {
-      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-      border-radius: 16px;
-      padding: 24px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border-radius: 1rem;
+      padding: 1.5rem;
       text-align: center;
       flex: 1;
-      min-width: 160px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.5);
+      min-width: 140px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
       transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+      animation: rotate 10s linear infinite;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .stat-card > * {
+      position: relative;
+      z-index: 1;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(59, 130, 246, 0.5);
+      box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
     }
     .stat-icon {
-      font-size: 2.5rem;
-      margin-bottom: 12px;
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
     .stat-label {
       font-size: 0.875rem;
-      color: #64748b;
-      margin-bottom: 8px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
     }
     .stat-value {
       font-size: 2rem;
-      font-weight: 800;
-      color: #1e293b;
+      font-weight: 700;
+      color: var(--text-primary);
       line-height: 1;
     }
     .stat-unit {
-      font-size: 0.875rem;
-      color: #94a3b8;
-      margin-top: 6px;
-      font-weight: 500;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -56,5 +84,4 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 export class StatCardComponent {
   label = input.required<string>();
   unit = input<string>();
-  icon = input<string>('📊');
 }
