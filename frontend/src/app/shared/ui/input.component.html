@@ -1,0 +1,18 @@
+<div class="flex flex-col gap-2">
+  <label [for]="id" class="text-sm font-semibold text-slate-600 dark:text-slate-400" *ngIf="label">
+    {{ label }}
+  </label>
+  <input
+    [id]="id"
+    [type]="type"
+    [value]="value"
+    (input)="onInput($event)"
+    [placeholder]="placeholder"
+    [required]="required"
+    [disabled]="disabled"
+    class="w-full px-4 py-3 font-medium bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-600 rounded-lg transition-all outline-none hover:border-slate-400 dark:hover:border-slate-500 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/20 disabled:bg-slate-100 dark:disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed"
+  />
+  <small class="text-xs text-slate-500 dark:text-slate-400" *ngIf="hint">
+    {{ hint }}
+  </small>
+</div>
