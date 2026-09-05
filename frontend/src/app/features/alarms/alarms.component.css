@@ -1,8 +1,8 @@
 .page-title {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 2rem;
-  background: var(--gradient-primary);
+  margin-bottom: 24px;
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -11,23 +11,28 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1rem 1.25rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(148, 163, 184, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 .alarms-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 12px;
 }
 .alarm-row {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  transition: all 0.2s;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(8px);
+  transition: var(--transition);
+  animation: alarmEnter 0.5s ease-out;
   position: relative;
   overflow: hidden;
 }
@@ -36,50 +41,45 @@
   position: absolute;
   left: 0;
   top: 0;
-  bottom: 0;
   width: 4px;
-}
-.alarm-row.severity-low::before {
-  background: var(--success);
-}
-.alarm-row.severity-medium::before {
-  background: var(--warning);
-}
-.alarm-row.severity-high::before {
-  background: #f97316;
-}
-.alarm-row.severity-critical::before {
-  background: var(--danger);
+  height: 100%;
+  background: var(--accent-gradient);
+  opacity: 0;
+  transition: var(--transition);
 }
 .alarm-row:hover {
-  background: rgba(255, 255, 255, 0.06);
   border-color: rgba(59, 130, 246, 0.3);
-  transform: translateX(5px);
+  background: rgba(15, 23, 42, 0.8);
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.alarm-row:hover::before {
+  opacity: 1;
 }
 .alarm-meta {
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
   font-size: 0.75rem;
   color: var(--text-secondary);
-  margin-bottom: 0.75rem;
-  flex-wrap: wrap;
+  margin-bottom: 10px;
+  font-weight: 500;
 }
 .alarm-time {
   font-weight: 600;
   color: var(--accent-primary);
 }
 .alarm-severity {
-  padding: 0.25rem 0.75rem;
-  border-radius: 2rem;
+  padding: 4px 10px;
+  border-radius: 6px;
   font-weight: 700;
   font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
 }
 .severity-low {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 .severity-medium {
   background: rgba(245, 158, 11, 0.2);
@@ -95,23 +95,24 @@
   background: rgba(239, 68, 68, 0.2);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: pulse-critical 1.5s infinite;
 }
 .alarm-code {
-  font-family: 'Consolas', monospace;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 0.25rem 0.5rem;
-  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  background: rgba(148, 163, 184, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
   font-size: 0.7rem;
 }
 .alarm-message {
   font-size: 0.875rem;
   color: var(--text-primary);
-  margin-bottom: 1rem;
+  margin-bottom: 12px;
   line-height: 1.6;
 }
 .alarm-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: 8px;
 }
 .alarm-ack {
   font-size: 0.75rem;
@@ -119,18 +120,36 @@
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 6px;
 }
 .alarm-ack::before {
-  content: '\F26A';
-  font-family: 'bootstrap-icons';
-  font-size: 1rem;
+  content: '✓';
+  font-weight: 700;
 }
 .error-msg {
-  margin-top: 1.5rem;
-  padding: 1rem 1.25rem;
+  margin-top: 20px;
+  padding: 16px;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: 0.75rem;
-  color: var(--danger);
+  border-radius: var(--radius-sm);
+  color: var(--error);
+  font-size: 0.875rem;
+}
+@keyframes alarmEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes pulse-critical {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+  }
 }
