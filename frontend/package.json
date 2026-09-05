@@ -1,0 +1,28 @@
+{
+  "name": "flowio-angular",
+  "version": "1.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --host 0.0.0.0",
+    "start:proxy": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.cjs",
+    "build": "ng build --configuration production",
+    "build:docker": "ng build --configuration docker",
+    "watch": "ng build --watch --configuration development"
+  },
+  "dependencies": {
+    "@angular/core": "^22.0.0",
+    "@angular/common": "^22.0.0",
+    "@angular/router": "^22.0.0",
+    "@angular/forms": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "@angular/platform-browser-dynamic": "^22.0.0",
+    "rxjs": "^7.8.0"
+  },
+  "devDependencies": {
+    "@angular/cli": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/compiler-cli": "^22.0.0",
+    "@angular-devkit/build-angular": "^22.0.0",
+    "typescript": "~5.4.0"
+  }
+}
