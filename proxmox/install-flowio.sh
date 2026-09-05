@@ -44,7 +44,6 @@ ufw --force enable
 ufw default deny incoming
 ufw default allow outgoing
 ufw allow 80/tcp
-ufw allow 1883/tcp
 ufw allow 22/tcp
 
 # 5. Create directory
@@ -70,22 +69,10 @@ services:
     volumes:
       - ./config.json:/usr/share/nginx/html/config.json:ro
     restart: unless-stopped
-  mosquitto:
-    image: eclipse-mosquitto:2
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
-    restart: unless-stopped
 EOF
     cat > config.json << 'EOF'
-{"mqtt":{"broker":"localhost","port":1883,"path":"/mqtt"},"device":{"name":"Flow.io"}}
+{"mqtt":{"broker":"192.168.1.100","port":1883,"path":"/mqtt"},"device":{"name":"Flow.io"}}
 EOF
-    mkdir -p mosquitto/config
-    echo -e "listener 1883\nallow_anonymous true\n\nlistener 9001\nprotocol websockets\nallow_anonymous true" > mosquitto/config/mosquitto.conf
 fi
 
 # 7. Enable Docker
@@ -102,7 +89,7 @@ echo ""
 echo "1. Modifier config MQTT :"
 echo "   cd /opt/flowio"
 echo "   nano config.json"
-echo "   # Changer broker, port, user, password"
+echo "   # Changer broker (IP de l'ESP32 ou broker)"
 echo ""
 echo "2. Lancer Flow.io :"
 echo "   docker compose up -d"
@@ -112,4 +99,4 @@ echo "   http://$(hostname -I | awk '{print $1}')"
 echo ""
 echo "======================================="
 echo ""
-log_info "N'oubliez pas de modifier config.json avant de lancer !"
+log_info "Modifier config.json avec l'IP du broker MQTT avant de lancer !"
