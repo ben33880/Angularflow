@@ -1,92 +1,110 @@
-<div class="space-y-8">
-  <div>
-    <h1 class="text-4xl font-bold text-gradient mb-2">⚙️ Configuration</h1>
-    <p class="text-dark-400">Paramè¬°tres du contrôleur</p>
-  </div>
+<div class="page-header fade-in">
+  <h1 class="page-title">⚙️ Configuration</h1>
+  <p class="page-subtitle">Paramè¬®tres ré­seau et MQTT de votre contrôleur</p>
+</div>
 
-  <flow-card title="🌐 Ré­­seau & MQTT">
-    <div class="space-y-6" *ngIf="config(); else loadingTpl">
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-dark-300">SSID Wi‑Fi</label>
-        <input type="text" 
-               [ngModel]="config()!.wifiSsid"
-               (ngModelChange)="configSignal.update(c => c ? {...c, wifiSsid: $event} : c)"
-               class="input-field"
-               placeholder="MonWiFi" />
-      </div>
+<flow-card title="🌐 Ré­seau & MQTT" class="fade-in">
+  <div class="config-form" *ngIf="config(); else loadingTpl">
+    <div class="form-section">
+      <h3 class="section-title">📡 Wi‑Fi</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">📶</span>
+            SSID Wi‑Fi
+          </label>
+          <input type="text" class="form-input" 
+                 [ngModel]="config()!.wifiSsid"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, wifiSsid: $event} : c)" 
+                 placeholder="Nom du ré­seau Wi‑Fi" />
+        </div>
 
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-dark-300">Mot de passe Wi‑Fi</label>
-        <input type="password" 
-               [ngModel]="config()!.wifiPassword ?? ''"
-               (ngModelChange)="configSignal.update(c => c ? {...c, wifiPassword: $event} : c)"
-               class="input-field"
-               placeholder="••••••••" />
-      </div>
-
-      <div class="flex items-center gap-3 p-4 glass rounded-xl">
-        <input type="checkbox" 
-               [ngModel]="config()!.mqttEnabled"
-               (ngModelChange)="configSignal.update(c => c ? {...c, mqttEnabled: $event} : c)"
-               class="w-5 h-5 rounded accent-primary-500" />
-        <label class="text-sm font-medium text-dark-200">MQTT activé¬°</label>
-      </div>
-
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-dark-300">Broker MQTT</label>
-        <input type="text" 
-               [ngModel]="config()!.mqttBroker"
-               (ngModelChange)="configSignal.update(c => c ? {...c, mqttBroker: $event} : c)"
-               class="input-field"
-               placeholder="mqtt://192.168.1.XX:1883" />
-      </div>
-
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-dark-300">Username MQTT</label>
-        <input type="text" 
-               [ngModel]="config()!.mqttUsername ?? ''"
-               (ngModelChange)="configSignal.update(c => c ? {...c, mqttUsername: $event} : c)"
-               class="input-field"
-               placeholder="mqtt_user" />
-      </div>
-
-      <div class="space-y-2">
-        <label class="text-sm font-medium text-dark-300">Password MQTT</label>
-        <input type="password" 
-               [ngModel]="config()!.mqttPassword ?? ''"
-               (ngModelChange)="configSignal.update(c => c ? {...c, mqttPassword: $event} : c)"
-               class="input-field"
-               placeholder="••••••••" />
-      </div>
-
-      <div class="flex gap-4 pt-4">
-        <flow-button variant="primary" (clicked)="save()">
-          💾 Enregistrer
-        </flow-button>
-        <flow-button (clicked)="load()">
-          🔄 Recharger
-        </flow-button>
-      </div>
-
-      <div class="p-4 glass rounded-xl border border-green-500/30" *ngIf="saved()">
-        <div class="flex items-center gap-3">
-          <span class="text-xl">✅</span>
-          <span class="text-green-300">Configuration enregistré­­e</span>
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">🔑</span>
+            Mot de passe Wi‑Fi
+          </label>
+          <input type="password" class="form-input" 
+                 [ngModel]="config()!.wifiPassword ?? ''"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, wifiPassword: $event} : c)" 
+                 placeholder="••••••••" />
         </div>
       </div>
     </div>
 
-    <ng-template #loadingTpl>
-      <div class="flex items-center justify-center py-12">
-        <div class="animate-pulse text-dark-400">Chargement…</div>
+    <div class="form-section">
+      <h3 class="section-title">📨 MQTT</h3>
+      <div class="form-row">
+        <label class="checkbox-label">
+          <input type="checkbox" class="checkbox-input" 
+                 [ngModel]="config()!.mqttEnabled"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, mqttEnabled: $event} : c)" />
+          <span class="checkbox-text">Activer MQTT</span>
+        </label>
       </div>
-    </ng-template>
-  </flow-card>
 
-  <div class="p-4 glass rounded-xl border border-red-500/30" *ngIf="error()">
-    <div class="flex items-center gap-3">
-      <span class="text-xl">⚠️</span>
-      <span class="text-red-300">{{ error() }}</span>
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">🖥️</span>
+            Broker MQTT
+          </label>
+          <input type="text" class="form-input" 
+                 [ngModel]="config()!.mqttBroker"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, mqttBroker: $event} : c)" 
+                 placeholder="mqtt://broker.local:1883" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">👤</span>
+            Username MQTT
+          </label>
+          <input type="text" class="form-input" 
+                 [ngModel]="config()!.mqttUsername ?? ''"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, mqttUsername: $event} : c)" 
+                 placeholder="username" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">
+            <span class="label-icon">🔐</span>
+            Password MQTT
+          </label>
+          <input type="password" class="form-input" 
+                 [ngModel]="config()!.mqttPassword ?? ''"
+                 (ngModelChange)="configSignal.update(c => c ? {...c, mqttPassword: $event} : c)" 
+                 placeholder="••••••••" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <flow-button variant="primary" (clicked)="save()">
+        <span>💾</span>
+        Enregistrer
+      </flow-button>
+      <flow-button (clicked)="load()">
+        <span>🔄</span>
+        Recharger
+      </flow-button>
+    </div>
+
+    <div class="success-msg" *ngIf="saved()">
+      <span class="success-icon">✅</span>
+      Configuration enregistré­e avec succès
     </div>
   </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement de la configuration…</p>
+    </div>
+  </ng-template>
+</flow-card>
+
+<div class="error-msg" *ngIf="error()">
+  <span class="error-icon">⚠️</span>
+  <span>{{ error() }}</span>
 </div>
