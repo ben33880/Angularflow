@@ -1,10 +1,11 @@
 # Flow.io Angular UI
 
-Application Angular 22+ (standalone, signals, zoneless) pour piloter un contrôleur Flow.io-Waveshare.
+Application Angular 22+ (standalone, signals, zoneless) avec **Tailwind CSS** pour un design moderne et sombre.
 
 ## Stack
 
 - **Angular 22+** : standalone components, signals, zoneless
+- **Tailwind CSS** : design system custom (dark mode, gradients, glassmorphism)
 - **HttpClient** + interceptors
 - **Stores légers** (pattern signal-based)
 - **Docker** (nginx, Node 26) pour le déploiement
@@ -46,6 +47,14 @@ Puis ouvrir http://localhost:8080
 
 À· adapter selon `WebInterfaceServer.cpp` du firmware.
 
+## Features UI
+
+- 🎨 Dark mode avec gradients
+- 🪞 Glassmorphism (backdrop blur)
+- ✨ Animations fluides
+- 📱 Responsive
+- 🎯 Composants custom (cards, buttons, badges)
+
 ## Architecture
 
 - **Components** : standalone, OnPush, DestroyRef pour cleanup
@@ -60,3 +69,4 @@ Puis ouvrir http://localhost:8080
 - Interceptors pour API prefix + error handling
 - Guards pour device connectivity
 - Lazy loading des features
+- Tailwind CSS pour le styling
