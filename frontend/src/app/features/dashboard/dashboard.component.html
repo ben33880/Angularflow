@@ -1,161 +1,162 @@
-<div class="dashboard-header animate-fade-in">
-  <h1 class="page-title">
-    <i class="bi bi-water"></i>
-    <span>Dashboard Piscine</span>
-  </h1>
-  <div class="header-actions">
-    <div class="connection-badge" *ngIf="mqttConnected()">
-      <i class="bi bi-wifi"></i>
-      <span>MQTT</span>
-    </div>
-    <button class="btn-refresh" (click)="load()" [class.loading]="loading()">
-      <i class="bi bi-arrow-clockwise"></i>
-    </button>
+<div class="max-w-7xl mx-auto animate-fade-in">
+  <!-- Header -->
+  <div class="mb-8 animate-slide-up">
+    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Dashboard</h1>
+    <p class="text-slate-600 dark:text-slate-400">Vue d'ensemble de votre piscine</p>
   </div>
-</div>
 
-<!-- System Status -->
-<flow-card *ngIf="system()" title="Syst&egrave;me" class="animate-fade-in">
-  <div class="system-grid">
-    <div class="system-stat">
-      <i class="bi bi-clock"></i>
-      <span>{{ (system()!.uptime / 3600) | number:'1.0-1' }}h</span>
-      <small>Uptime</small>
-    </div>
-    <div class="system-stat">
-      <i class="bi bi-memory"></i>
-      <span>{{ ((system()!.freeMemory / system()!.totalMemory) * 100) | number:'1.0-0' }}%</span>
-      <small>M&eacute;moire</small>
-    </div>
-    <div class="system-stat">
-      <i class="bi bi-reception-4"></i>
-      <span>{{ system()!.wifiRssi }} dBm</span>
-      <small>WiFi</small>
-    </div>
-  </div>
-</flow-card>
-
-<!-- Pool Status -->
-<div class="stats-grid animate-fade-in" style="animation-delay: 0.1s">
-  <flow-card *ngIf="status() || chemistry()">
-    <flow-stat-card label="Temp&eacute;rature" unit=" &deg;C">
-      {{ temperature() | temperature }}
-    </flow-stat-card>
-  </flow-card>
-  <flow-card *ngIf="status() || chemistry()">
-    <flow-stat-card label="pH">
-      {{ ph() ?? '–' }}
-    </flow-stat-card>
-  </flow-card>
-  <flow-card *ngIf="status() || chemistry()">
-    <flow-stat-card label="ORP" unit="mV">
-      {{ orp() ?? '–' }}
-    </flow-stat-card>
-  </flow-card>
-</div>
-
-<!-- Temperatures -->
-<flow-card *ngIf="temperatures()" title="Temp&eacute;ratures" class="animate-fade-in" style="animation-delay: 0.2s">
-  <div class="temps-grid">
-    <div class="temp-item">
-      <i class="bi bi-thermometer-half"></i>
-      <span class="temp-name">Bassin</span>
-      <span class="temp-value">{{ temperatures()!.basin | temperature }}</span>
-    </div>
-    <div class="temp-item">
-      <i class="bi bi-arrow-return-left"></i>
-      <span class="temp-name">Retour</span>
-      <span class="temp-value">{{ temperatures()!.return | temperature }}</span>
-    </div>
-    <div class="temp-item">
-      <i class="bi bi-gear-wide-connected"></i>
-      <span class="temp-name">Local</span>
-      <span class="temp-value">{{ temperatures()!.equipment | temperature }}</span>
-    </div>
-    <div class="temp-item" *ngIf="temperatures()!.outdoor">
-      <i class="bi bi-sun"></i>
-      <span class="temp-name">Ext&eacute;rieur</span>
-      <span class="temp-value">{{ temperatures()!.outdoor | temperature }}</span>
-    </div>
-  </div>
-</flow-card>
-
-<!-- Chemistry -->
-<flow-card *ngIf="chemistry()" title="Chimie" class="animate-fade-in" style="animation-delay: 0.3s">
-  <div class="chemistry-grid">
-    <div class="chem-item">
-      <div class="chem-label">pH</div>
-      <div class="chem-value" [class.good]="chemistry()!.ph >= 7.0 && chemistry()!.ph <= 7.4" [class.bad]="chemistry()!.ph < 7.0 || chemistry()!.ph > 7.4">
-        {{ chemistry()!.ph }}
-      </div>
-    </div>
-    <div class="chem-item">
-      <div class="chem-label">ORP</div>
-      <div class="chem-value" [class.good]="chemistry()!.orp >= 650" [class.bad]="chemistry()!.orp < 650">
-        {{ chemistry()!.orp }} mV
-      </div>
-    </div>
-  </div>
-</flow-card>
-
-<!-- Equipment -->
-<flow-card title="&Eacute;quipements" class="animate-fade-in" style="animation-delay: 0.4s">
-  <div class="equipments" *ngIf="status(); else loadingTpl">
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-droplet-fill"></i>
-        <div>
-          <div class="equipment-name">Filtration</div>
-          <div class="equipment-status" [class.status-on]="status()!.filtrationOn">
-            {{ status()!.filtrationOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
-          </div>
+  <!-- Stats Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Temperature -->
+    <app-stat-card
+      label="Tempé·§rature"
+      [value]="(temperature | temperature) ?? '--'"
+      icon="🌡️"
+    >
+      <div class="mt-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-primary-100 to-cyan-100 dark:from-primary-900/30 dark:to-cyan-900/30 rounded-full border border-primary-500 dark:border-primary-400">
+          <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ temperature | temperature }}</span>
         </div>
       </div>
-      <flow-button variant="primary" (clicked)="toggleFiltration()">
-        <i class="bi" [class.bi-play-fill]="!status()!.filtrationOn" [class.bi-stop-fill]="status()!.filtrationOn"></i>
-        {{ status()!.filtrationOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
-      </flow-button>
-    </div>
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-flask"></i>
-        <div>
-          <div class="equipment-name">Dosage chlore</div>
-          <div class="equipment-status" [class.status-on]="status()!.chlorineDosingOn">
-            {{ status()!.chlorineDosingOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
-          </div>
-        </div>
-      </div>
-      <flow-button variant="primary" (clicked)="toggleChlorine()">
-        <i class="bi" [class.bi-play-fill]="!status()!.chlorineDosingOn" [class.bi-stop-fill]="status()!.chlorineDosingOn"></i>
-        {{ status()!.chlorineDosingOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
-      </flow-button>
-    </div>
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-ph-down"></i>
-        <div>
-          <div class="equipment-name">Dosage pH-</div>
-          <div class="equipment-status" [class.status-on]="status()!.phDosingOn">
-            {{ status()!.phDosingOn ? 'En marche' : 'Arr&ecirc;t&eacute;' }}
-          </div>
-        </div>
-      </div>
-      <flow-button variant="primary" (clicked)="togglePh()">
-        <i class="bi" [class.bi-play-fill]="!status()!.phDosingOn" [class.bi-stop-fill]="status()!.phDosingOn"></i>
-        {{ status()!.phDosingOn ? 'Arr&ecirc;ter' : 'D&eacute;marrer' }}
-      </flow-button>
-    </div>
-  </div>
-  <ng-template #loadingTpl>
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <span>Chargement…</span>
-    </div>
-  </ng-template>
-</flow-card>
+    </app-stat-card>
 
-<div class="error-alert" *ngIf="error()">
-  <i class="bi bi-exclamation-triangle"></i>
-  {{ error() }}
+    <!-- pH -->
+    <app-stat-card
+      label="pH"
+      [value]="(ph ?? '--').toString()"
+      icon="🧪"
+    >
+      <div class="mt-4 flex items-center gap-2">
+        <div 
+          class="px-3 py-1 rounded-full text-xs font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': ph >= 7.0 && ph <= 7.6,
+            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': (ph >= 6.8 && ph < 7.0) || (ph > 7.6 && ph <= 7.8),
+            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': ph < 6.8 || ph > 7.8
+          }"
+        >
+          {{ ph >= 7.0 && ph <= 7.6 ? '✓ Bon' : '⚠ Ajuster' }}
+        </div>
+      </div>
+    </app-stat-card>
+
+    <!-- ORP -->
+    <app-stat-card
+      label="ORP"
+      [value]="(orp ?? '--').toString() + ' mV'"
+      icon="⚡"
+    >
+      <div class="mt-4 flex items-center gap-2">
+        <div 
+          class="px-3 py-1 rounded-full text-xs font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400': orp >= 650,
+            'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400': orp >= 600 && orp < 650,
+            'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400': orp < 600
+          }"
+        >
+          {{ orp >= 650 ? '✓ Bon' : '⚠ Bas' }}
+        </div>
+      </div>
+    </app-stat-card>
+
+    <!-- System Status -->
+    <app-stat-card
+      label="Systè§°me"
+      value="{{ mqttConnected() ? 'En ligne' : 'Hors ligne' }}"
+      icon="⚙️"
+    >
+      <div class="mt-4">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full" [ngClass]="mqttConnected() ? 'bg-green-500 animate-pulse' : 'bg-red-500'"></span>
+          <span class="text-sm text-slate-600 dark:text-slate-400">{{ mqttConnected() ? 'MQTT connecté' : 'Dé§°connecté·§' }}</span>
+        </div>
+      </div>
+    </app-stat-card>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-up">
+    <!-- Filtration -->
+    <app-card>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Filtration</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Pompe de filtration</p>
+        </div>
+        <span class="text-3xl">💧</span>
+      </div>
+      <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
+        <div class="toggle-label">
+          <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.filtrationOn ? 'Activé·§e' : 'Dé§°sactivé·§e' }}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">Contrô·§·le manuel</span>
+        </div>
+        <app-button
+          [variant]="status()?.filtrationOn ? 'danger' : 'primary'"
+          (click)="toggleFiltration()"
+          [disabled]="!mqttConnected()"
+        >
+          {{ status()?.filtrationOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+        </app-button>
+      </div>
+    </app-card>
+
+    <!-- Chlore -->
+    <app-card>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Chlore</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Doseur de chlore</p>
+        </div>
+        <span class="text-3xl">🧂</span>
+      </div>
+      <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
+        <div class="toggle-label">
+          <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.chlorineDosingOn ? 'Activé·§' : 'Dé§°sactivé·§' }}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.orp ?? '--' }} mV</span>
+        </div>
+        <app-button
+          [variant]="status()?.chlorineDosingOn ? 'danger' : 'primary'"
+          (click)="toggleChlorine()"
+          [disabled]="!mqttConnected()"
+        >
+          {{ status()?.chlorineDosingOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+        </app-button>
+      </div>
+    </app-card>
+
+    <!-- pH -->
+    <app-card>
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-slate-900 dark:text-white">pH</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400">Correcteur de pH</p>
+        </div>
+        <span class="text-3xl">🔬</span>
+      </div>
+      <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
+        <div class="toggle-label">
+          <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.phDosingOn ? 'Activé·§' : 'Dé§°sactivé·§' }}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.ph ?? '--' }}</span>
+        </div>
+        <app-button
+          [variant]="status()?.phDosingOn ? 'danger' : 'primary'"
+          (click)="togglePh()"
+          [disabled]="!mqttConnected()"
+        >
+          {{ status()?.phDosingOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+        </app-button>
+      </div>
+    </app-card>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-10 w-10 border-4 border-slate-300 dark:border-slate-600 border-t-primary-500"></div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error()" class="mt-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-400 text-center">
+    {{ error() }}
+  </div>
 </div>
