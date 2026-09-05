@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FlowioApiService } from '../../services/flowio-api.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -17,6 +17,7 @@ import type { PoolStatus } from '../../models/flowio.models';
 })
 export class DashboardComponent implements OnInit {
   private readonly api = inject(FlowioApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly statusSignal = signal<PoolStatus | null>(null);
   readonly status = computed(() => this.statusSignal());
@@ -27,8 +28,12 @@ export class DashboardComponent implements OnInit {
   readonly ph = computed(() => this.statusSignal()?.ph ?? null);
   readonly orp = computed(() => this.statusSignal()?.orp ?? null);
 
+  private pollingInterval?: ReturnType<typeof setInterval>;
+
   ngOnInit(): void {
     this.load();
+    this.startPolling();
+    this.destroyRef.onDestroy(() => this.stopPolling());
   }
 
   load(): void {
@@ -62,5 +67,15 @@ export class DashboardComponent implements OnInit {
     const s = this.statusSignal();
     if (!s) return;
     this.api.setPhDosing(!s.phDosingOn).subscribe(() => this.load());
+  }
+
+  private startPolling(): void {
+    this.pollingInterval = setInterval(() => this.load(), 5000);
+  }
+
+  private stopPolling(): void {
+    if (this.pollingInterval) {
+      clearInterval(this.pollingInterval);
+    }
   }
 }
