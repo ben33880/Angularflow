@@ -6,122 +6,121 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="nav">
-      <div class="nav-brand">
-        <div class="brand-icon">🏊</div>
-        <span class="brand-text">Flow.io</span>
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <i class="bi bi-water"></i>
+        <span>Flow.io</span>
       </div>
-      <div class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active">
-          <span class="nav-icon">📊</span>
+      <div class="sidebar-menu">
+        <a routerLink="/dashboard" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-speedometer2"></i>
           <span>Dashboard</span>
         </a>
-        <a routerLink="/config" routerLinkActive="active">
-          <span class="nav-icon">⚙️</span>
+        <a routerLink="/config" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-gear"></i>
           <span>Config</span>
         </a>
-        <a routerLink="/logs" routerLinkActive="active">
-          <span class="nav-icon">📋</span>
+        <a routerLink="/logs" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-journal-text"></i>
           <span>Logs</span>
         </a>
-        <a routerLink="/alarms" routerLinkActive="active">
-          <span class="nav-icon">🚨</span>
+        <a routerLink="/alarms" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-exclamation-triangle"></i>
           <span>Alarmes</span>
         </a>
       </div>
-      <div class="nav-footer">
+      <div class="sidebar-footer">
         <div class="status-badge">
           <span class="status-dot"></span>
-          <span>Connecté·§</span>
+          <span>En ligne</span>
         </div>
       </div>
     </nav>
   `,
   styles: [`
-    .nav {
+    .sidebar {
       width: 260px;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      color: #fff;
-      padding: 24px 16px;
+      background: var(--bg-secondary);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
-      gap: 24px;
-      box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
+      padding: 1.5rem;
+      position: fixed;
+      height: 100vh;
+      z-index: 100;
     }
-    .nav-brand {
+    .sidebar-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      backdrop-filter: blur(10px);
-    }
-    .brand-icon {
-      font-size: 2rem;
-    }
-    .brand-text {
+      gap: 0.75rem;
       font-size: 1.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, #60a5fa, #a78bfa);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .sidebar-brand i {
+      font-size: 2rem;
+      background: var(--gradient-primary);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
-    .nav-links {
+    .sidebar-menu {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
       flex: 1;
     }
-    .nav-links a {
+    .sidebar-link {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      color: #94a3b8;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      color: var(--text-secondary);
       text-decoration: none;
-      border-radius: 10px;
+      border-radius: 0.75rem;
       transition: all 0.2s;
       font-weight: 500;
     }
-    .nav-links a:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: #fff;
-      transform: translateX(4px);
-    }
-    .nav-links a.active {
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      color: #fff;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-    }
-    .nav-icon {
+    .sidebar-link i {
       font-size: 1.25rem;
     }
-    .nav-footer {
-      padding-top: 16px;
+    .sidebar-link:hover {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--text-primary);
+    }
+    .sidebar-link.active {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+    .sidebar-footer {
+      padding-top: 1.5rem;
       border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
     .status-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      background: rgba(34, 197, 94, 0.1);
-      border-radius: 8px;
+      gap: 0.5rem;
       font-size: 0.875rem;
-      color: #4ade80;
-      font-weight: 600;
+      color: var(--text-secondary);
     }
     .status-dot {
       width: 8px;
       height: 8px;
-      background: #4ade80;
+      background: var(--success);
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush

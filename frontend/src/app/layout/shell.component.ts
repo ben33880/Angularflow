@@ -10,7 +10,7 @@ import { NavComponent } from './nav.component';
     <div class="app-shell">
       <app-nav />
       <main class="app-main">
-        <div class="content-wrapper">
+        <div class="container-fluid py-4">
           <router-outlet />
         </div>
       </main>
@@ -23,12 +23,8 @@ import { NavComponent } from './nav.component';
     }
     .app-main {
       flex: 1;
-      padding: 32px;
-      overflow-y: auto;
-    }
-    .content-wrapper {
-      max-width: 1400px;
-      margin: 0 auto;
+      background: var(--bg-primary);
+      overflow-x: hidden;
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
