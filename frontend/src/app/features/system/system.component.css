@@ -1,0 +1,58 @@
+.page-title {
+  @apply flex items-center gap-4 text-4xl font-bold mb-8;
+  @apply bg-gradient-primary bg-clip-text;
+  -webkit-text-fill-color: transparent;
+}
+
+.system-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+}
+
+.stat-row {
+  @apply flex justify-between items-center py-4 border-b border-white/10;
+}
+
+.stat-row:last-child {
+  @apply border-b-0;
+}
+
+.stat-label {
+  @apply text-text-secondary;
+}
+
+.stat-value {
+  @apply font-semibold text-text-primary;
+}
+
+.stat-value.good {
+  @apply text-green-400;
+}
+
+.stat-value.medium {
+  @apply text-yellow-400;
+}
+
+.stat-value.bad {
+  @apply text-red-400;
+}
+
+.stat-value.connected {
+  @apply text-green-400;
+}
+
+.stat-value i {
+  @apply text-lg;
+}
+
+.actions-grid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.empty-state {
+  @apply flex flex-col items-center justify-center p-12;
+  @apply text-text-secondary;
+}
+
+.empty-state i {
+  @apply text-6xl mb-4;
+}
