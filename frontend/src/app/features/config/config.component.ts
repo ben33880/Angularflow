@@ -6,6 +6,7 @@ import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
 import { InputComponent } from '../../shared/ui/input.component';
+import { ToastService } from '../../shared/ui/toast.service';
 import type { DeviceConfig } from '../../models/flowio.models';
 
 @Component({
@@ -19,6 +20,7 @@ import type { DeviceConfig } from '../../models/flowio.models';
 export class ConfigComponent implements OnInit {
   private readonly fileConfig = inject(FileConfigService);
   private readonly mqtt = inject(MqttService);
+  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly configSignal = signal<DeviceConfig | null>(null);
@@ -39,7 +41,6 @@ export class ConfigComponent implements OnInit {
   constructor() {}
 
   ngOnInit(): void {
-    // Load MQTT config from file
     const cfg = this.fileConfig.config();
     this.broker.set(cfg.mqtt.broker);
     this.port.set(cfg.mqtt.port.toString());
@@ -47,7 +48,6 @@ export class ConfigComponent implements OnInit {
     this.username.set(cfg.mqtt.username ?? '');
     this.password.set(cfg.mqtt.password ?? '');
     
-    // Auto-connect
     this.mqtt.connect();
     
     this.destroyRef.onDestroy(() => this.mqtt.disconnect());
@@ -70,12 +70,13 @@ export class ConfigComponent implements OnInit {
       });
       
       this.saved.set(true);
+      this.toast.success('Configuration MQTT sauvegardé§°e ! Reconnexion...');
       
-      // Reconnect with new config
       this.mqtt.disconnect();
       setTimeout(() => this.mqtt.connect(), 500);
     } catch (e) {
       this.error.set('Erreur lors de la sauvegarde');
+      this.toast.error('Erreur de sauvegarde');
     } finally {
       this.loading.set(false);
     }
@@ -89,8 +90,8 @@ export class ConfigComponent implements OnInit {
     this.error.set(null);
     this.saved.set(false);
     
-    // Use MQTT to update device config
     this.mqtt.updateConfig(cfg);
+    this.toast.success('Configuration device envoyÃ©e !');
     
     setTimeout(() => {
       this.saved.set(true);
@@ -101,6 +102,7 @@ export class ConfigComponent implements OnInit {
   reboot(): void {
     if (confirm('Voulez-vous vraiment redé§°marrer le contrôleur ?')) {
       this.mqtt.reboot();
+      this.toast.info('Redé§°marrage en cours...');
     }
   }
 }
