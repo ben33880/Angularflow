@@ -1,13 +1,13 @@
 import { Component, inject, signal, computed, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, Router } from '@angular/router';
-import { NgIf, NgFor } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { NgIf, NgFor, NgClass } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { MqttConfigService } from '../../services/mqtt-config.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, NgIf, NgFor],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NgFor, NgClass],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,15 +24,14 @@ export class LayoutComponent implements OnInit {
   readonly navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/system', label: 'System', icon: '⚙️' },
-    { path: 'relays', label: 'Relays', icon: '🔌' },
-    { path: 'inputs', label: 'Inputs', icon: '📡' },
-    { path: 'logs', label: 'Logs', icon: '📋' },
-    { path: 'alarms', label: 'Alarms', icon: '🚨' },
-    { path: 'config', label: 'Config', icon: '🔧' }
+    { path: '/relays', label: 'Relays', icon: '🔌' },
+    { path: '/inputs', label: 'Inputs', icon: '📡' },
+    { path: '/logs', label: 'Logs', icon: '📋' },
+    { path: '/alarms', label: 'Alarms', icon: '🚨' },
+    { path: '/config', label: 'Config', icon: '🔧' }
   ];
 
   ngOnInit(): void {
-    // Auto-connect if configured
     if (this.isConfigured()) {
       this.mqtt.connect();
     }
