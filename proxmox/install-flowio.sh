@@ -75,10 +75,10 @@ fi
 
 log_info "Docker $(docker --version) installé"
 
-# 4. Installer Docker Compose (plugin)
+# 4. Docker Compose (plugin inclus)
 log_info "Docker Compose plugin déjà inclus avec Docker CE"
 
-# 5. Configurer le firewall
+# 5. Configurer le firewall (optionnel)
 log_info "Configuration du firewall (UFW)..."
 
 ufw --force enable
@@ -88,7 +88,7 @@ ufw default allow outgoing
 # Ports Flow.io
 ufw allow 80/tcp      # Frontend web
 ufw allow 1883/tcp    # MQTT
-ufw allow 22/tcp      # SSH (à§° désactiver si pas besoin)
+ufw allow 22/tcp      # SSH (garder pour accè§°s)
 
 log_info "Firewall configuré·§ - Ports ouverts: 80, 1883, 22"
 
@@ -98,10 +98,12 @@ log_info "Cré·§ation du dossier /opt/flowio..."
 mkdir -p /opt/flowio
 cd /opt/flowio
 
-# 7. Cloner le repo (ou créer les fichiers de base)
-log_info "Clonage du repository Flow.io..."
+# 7. Cloner le repo ou créer les fichiers de base
+log_info "Ré§°cupé·§ration des fichiers Flow.io..."
 
-git clone https://github.com/ben33880/Angularflow.git /opt/flowio 2>/dev/null || {
+if git clone https://github.com/ben33880/Angularflow.git . 2>/dev/null; then
+    log_info "Repository cloné·§ avec succès"
+else
     log_warn "Impossible de cloner le repo, création des fichiers de base..."
     
     # Créer docker-compose.yml
@@ -167,7 +169,7 @@ listener 9001
 protocol websockets
 allow_anonymous true
 EOF
-}
+fi
 
 # 8. Activer Docker au boot
 log_info "Activation de Docker au boot..."
@@ -175,7 +177,7 @@ systemctl enable docker
 systemctl start docker
 
 # 9. Afficher les infos
-log_info "Installation terminé§°e avec succès !"
+log_info "Installation terminé § §e avec succès !"
 echo ""
 echo "======================================="
 echo "  Prochaines é•tapes"
@@ -187,7 +189,7 @@ echo "   nano config.json"
 echo ""
 echo "2. Lancer Flow.io :"
 echo "   cd /opt/flowio"
-echo "   docker-compose up -d"
+echo "   docker compose up -d"
 echo ""
 echo "3. Accé§°der à l'interface :"
 echo "   http://$(hostname -I | awk '{print $1}')"
@@ -204,7 +206,7 @@ echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     log_info "Build et démarrage de Flow.io..."
     cd /opt/flowio
-    docker-compose up -d --build
+    docker compose up -d --build
     
     echo ""
     log_info "Flow.io est en ligne !"
