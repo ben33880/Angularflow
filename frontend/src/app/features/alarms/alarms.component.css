@@ -1,155 +1,111 @@
+/* Alarms page - Tailwind + custom */
 .page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
+  @apply text-4xl font-bold mb-8;
+  @apply bg-gradient-primary bg-clip-text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
+
 .alarms-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  padding: 12px 16px;
-  background: rgba(148, 163, 184, 0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  font-weight: 500;
+  @apply flex justify-between items-center mb-6 p-4 px-5;
+  @apply bg-white/5 rounded-xl border border-white/10;
 }
+
 .alarms-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  @apply flex flex-col gap-3;
 }
+
 .alarm-row {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 16px;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(8px);
-  transition: var(--transition);
-  animation: alarmEnter 0.5s ease-out;
-  position: relative;
-  overflow: hidden;
+  @apply border border-white/10 rounded-xl;
+  @apply p-5 bg-white/3;
+  @apply transition-all duration-200;
+  @apply relative overflow-hidden;
 }
+
 .alarm-row::before {
   content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--accent-gradient);
-  opacity: 0;
-  transition: var(--transition);
+  @apply absolute left-0 top-0 bottom-0 w-1;
 }
+
+.alarm-row.severity-low::before {
+  @apply bg-green-500;
+}
+
+.alarm-row.severity-medium::before {
+  @apply bg-yellow-500;
+}
+
+.alarm-row.severity-high::before {
+  @apply bg-orange-500;
+}
+
+.alarm-row.severity-critical::before {
+  @apply bg-red-500;
+}
+
 .alarm-row:hover {
-  border-color: rgba(59, 130, 246, 0.3);
-  background: rgba(15, 23, 42, 0.8);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  @apply bg-white/6 border-blue-500/30;
+  @apply translate-x-[5px];
 }
-.alarm-row:hover::before {
-  opacity: 1;
-}
+
 .alarm-meta {
-  display: flex;
-  gap: 12px;
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-  font-weight: 500;
+  @apply flex gap-3 text-xs text-text-secondary mb-3 flex-wrap;
 }
+
 .alarm-time {
-  font-weight: 600;
-  color: var(--accent-primary);
+  @apply font-semibold text-accent-primary;
 }
+
 .alarm-severity {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  @apply px-3 py-1 rounded-[2rem] font-bold text-[11px];
+  @apply uppercase tracking-wide;
 }
+
 .severity-low {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  @apply bg-green-500/20 text-green-400;
+  @apply border border-green-500/30;
 }
+
 .severity-medium {
-  background: rgba(245, 158, 11, 0.2);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  @apply bg-yellow-500/20 text-yellow-400;
+  @apply border border-yellow-500/30;
 }
+
 .severity-high {
-  background: rgba(249, 115, 22, 0.2);
-  color: #fb923c;
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  @apply bg-orange-500/20 text-orange-400;
+  @apply border border-orange-500/30;
 }
+
 .severity-critical {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  animation: pulse-critical 1.5s infinite;
+  @apply bg-red-500/20 text-red-400;
+  @apply border border-red-500/30;
 }
+
 .alarm-code {
-  font-family: 'JetBrains Mono', monospace;
-  background: rgba(148, 163, 184, 0.1);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
+  @apply font-mono bg-white/10 px-2 py-1 rounded;
+  @apply text-[11px];
 }
+
 .alarm-message {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  line-height: 1.6;
+  @apply text-sm text-text-primary mb-4 leading-relaxed;
 }
+
 .alarm-actions {
-  display: flex;
-  gap: 8px;
+  @apply flex gap-3;
 }
+
 .alarm-ack {
-  font-size: 0.75rem;
-  color: var(--success);
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  @apply text-xs text-green-500 font-semibold;
+  @apply flex items-center gap-2;
 }
+
 .alarm-ack::before {
-  content: '✓';
-  font-weight: 700;
+  content: '\F26A';
+  font-family: 'bootstrap-icons';
+  @apply text-base;
 }
+
 .error-msg {
-  margin-top: 20px;
-  padding: 16px;
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--radius-sm);
-  color: var(--error);
-  font-size: 0.875rem;
-}
-@keyframes alarmEnter {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes pulse-critical {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
-  }
+  @apply mt-6 p-4 px-5;
+  @apply bg-red-500/10 border border-red-500/30 rounded-xl;
+  @apply text-red-500;
 }
