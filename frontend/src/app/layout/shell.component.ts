@@ -7,24 +7,13 @@ import { NavComponent } from './nav.component';
   standalone: true,
   imports: [RouterOutlet, NavComponent],
   template: `
-    <div class="app-shell">
+    <div class="min-h-screen flex">
       <app-nav />
-      <main class="app-main">
+      <main class="flex-1 p-8 overflow-auto">
         <router-outlet />
       </main>
     </div>
   `,
-  styles: [`
-    .app-shell {
-      display: flex;
-      min-height: 100vh;
-    }
-    .app-main {
-      flex: 1;
-      padding: 24px;
-      background: #f3f4f6;
-    }
-  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShellComponent {}

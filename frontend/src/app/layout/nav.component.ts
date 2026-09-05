@@ -6,46 +6,38 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="nav">
-      <div class="nav-brand">Flow.io</div>
-      <div class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-        <a routerLink="/config" routerLinkActive="active">Config</a>
-        <a routerLink="/logs" routerLinkActive="active">Logs</a>
-        <a routerLink="/alarms" routerLinkActive="active">Alarmes</a>
+    <nav class="w-72 glass border-r border-dark-700/50 p-6 flex flex-col gap-8">
+      <div class="text-3xl font-bold text-gradient tracking-tight">
+        🌊 Flow.io
+      </div>
+      
+      <div class="flex flex-col gap-2">
+        <a routerLink="/dashboard" routerLinkActive="active" class="nav-link flex items-center gap-3">
+          <span>📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a routerLink="/config" routerLinkActive="active" class="nav-link flex items-center gap-3">
+          <span>⚙️</span>
+          <span>Config</span>
+        </a>
+        <a routerLink="/logs" routerLinkActive="active" class="nav-link flex items-center gap-3">
+          <span>📋</span>
+          <span>Logs</span>
+        </a>
+        <a routerLink="/alarms" routerLinkActive="active" class="nav-link flex items-center gap-3">
+          <span>🚨</span>
+          <span>Alarmes</span>
+        </a>
+      </div>
+      
+      <div class="mt-auto pt-6 border-t border-dark-700/50">
+        <div class="text-xs text-dark-400">
+          <p>Pool Controller</p>
+          <p class="mt-1">v1.0.0</p>
+        </div>
       </div>
     </nav>
   `,
-  styles: [`
-    .nav {
-      width: 220px;
-      background: #1f2937;
-      color: #fff;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .nav-brand {
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-    .nav-links {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .nav-links a {
-      color: #e5e7eb;
-      text-decoration: none;
-      padding: 6px 8px;
-      border-radius: 6px;
-    }
-    .nav-links a.active {
-      background: #374151;
-      color: #fff;
-    }
-  `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavComponent {}
