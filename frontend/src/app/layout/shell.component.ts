@@ -10,7 +10,7 @@ import { NavComponent } from './nav.component';
     <div class="app-shell">
       <app-nav />
       <main class="app-main">
-        <div class="container-fluid py-4">
+        <div class="app-content">
           <router-outlet />
         </div>
       </main>
@@ -23,8 +23,33 @@ import { NavComponent } from './nav.component';
     }
     .app-main {
       flex: 1;
-      background: var(--bg-primary);
-      overflow-x: hidden;
+      margin-left: 260px;
+      padding: 32px;
+      background: transparent;
+      animation: fadeIn 0.5s ease-out;
+    }
+    .app-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      animation: slideUp 0.6s ease-out;
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
