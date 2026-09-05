@@ -1,51 +1,19 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
-import type { PoolStatus, DeviceConfig, LogEntry, AlarmEntry } from '../models/flowio.models';
+// HTTP API service removed - MQTT is now the only communication protocol
+// See mqtt.service.ts for complete MQTT implementation
 
-@Injectable({ providedIn: 'root' })
-export class FlowioApiService {
-  private readonly http = inject(HttpClient);
-  private readonly baseUrl = environment.flowioBaseUrl;
+// This file is kept for backward compatibility reference only
 
-  getPoolStatus(): Observable<PoolStatus> {
-    return this.http.get<PoolStatus>(`${this.baseUrl}/api/pool/status`);
-  }
-
-  setFiltration(on: boolean): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/api/pool/filtration`, { on });
-  }
-
-  setChlorineDosing(on: boolean): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/api/pool/chlorine`, { on });
-  }
-
-  setPhDosing(on: boolean): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/api/pool/ph`, { on });
-  }
-
-  getConfig(): Observable<DeviceConfig> {
-    return this.http.get<DeviceConfig>(`${this.baseUrl}/api/device/config`);
-  }
-
-  updateConfig(config: DeviceConfig): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/api/device/config`, config);
-  }
-
-  getLogs(): Observable<LogEntry[]> {
-    return this.http.get<LogEntry[]>(`${this.baseUrl}/api/logs`);
-  }
-
-  getAlarms(): Observable<AlarmEntry[]> {
-    return this.http.get<AlarmEntry[]>(`${this.baseUrl}/api/alarms`);
-  }
-
-  acknowledgeAlarm(id: string): Observable<void> {
-    return this.http.post<void>(`${this.baseUrl}/api/alarms/${id}/ack`, {});
-  }
-
-  healthCheck(): Observable<{ status: string; uptime: number }> {
-    return this.http.get<{ status: string; uptime: number }>(`${this.baseUrl}/api/health`);
-  }
+export interface LegacyApiEndpoints {
+  // GET /api/pool/status - replaced by MQTT: flowio/pool/status
+  // POST /api/pool/filtration - replaced by MQTT: flowio/cmd/pool/filtration
+  // POST /api/pool/chlorine - replaced by MQTT: flowio/cmd/pool/chlorine
+  // POST /api/pool/ph - replaced by MQTT: flowio/cmd/pool/ph
+  // GET /api/device/config - replaced by MQTT subscription
+  // POST /api/device/config - replaced by MQTT: flowio/cmd/config/update
+  // GET /api/logs - replaced by MQTT: flowio/logs/+
+  // GET /api/alarms - replaced by MQTT: flowio/alarms/active
+  // POST /api/alarms/:id/ack - replaced by MQTT: flowio/cmd/alarm/ack
+  // GET /api/health - replaced by MQTT: flowio/system/status
 }
+
+// All components now use MqttService exclusively
