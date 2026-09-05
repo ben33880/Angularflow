@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlowioApiService } from '../../services/flowio-api.service';
@@ -16,6 +16,7 @@ import type { DeviceConfig } from '../../models/flowio.models';
 })
 export class ConfigComponent implements OnInit {
   private readonly api = inject(FlowioApiService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly configSignal = signal<DeviceConfig | null>(null);
   readonly config = computed(() => this.configSignal());

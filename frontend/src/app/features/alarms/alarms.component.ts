@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { FlowioApiService } from '../../services/flowio-api.service';
 import { CardComponent } from '../../shared/ui/card.component';
