@@ -1,33 +1,55 @@
-<h2 class="page-title">Alarmes</h2>
-
-<flow-card title="Liste des alarmes">
-  <div class="alarms-header">
-    <span>{{ alarms().length }} alarmes</span>
-    <flow-button variant="primary" (clicked)="load()">Rafraî®®chir</flow-button>
+<div class="space-y-8">
+  <div>
+    <h1 class="text-4xl font-bold text-gradient mb-2">🚨 Alarmes</h1>
+    <p class="text-dark-400">Gestion des alarmes systè¬®me</p>
   </div>
 
-  <div class="alarms-list" *ngIf="alarms().length > 0; else emptyTpl">
-    <div class="alarm-row" *ngFor="let alarm of alarms()">
-      <div class="alarm-meta">
-        <span class="alarm-time">{{ alarm.timestamp | date:'medium' }}</span>
-        <span class="alarm-severity" [class]="severityClass(alarm.severity)">{{ alarm.severity }}</span>
-        <span class="alarm-code">{{ alarm.code }}</span>
-      </div>
-      <div class="alarm-message">{{ alarm.message }}</div>
-      <div class="alarm-actions" *ngIf="!alarm.acknowledged">
-        <flow-button variant="primary" (clicked)="acknowledge(alarm.id)">Acquitter</flow-button>
-      </div>
-      <div class="alarm-ack" *ngIf="alarm.acknowledged">
-        <span>Acquitté¬°e</span>
+  <flow-card title="🔔 Liste des alarmes">
+    <div class="flex items-center justify-between mb-6">
+      <span class="text-dark-400">{{ alarms().length }} alarmes</span>
+      <flow-button variant="primary" (clicked)="load()">
+        🔄 Rafraî®®chir
+      </flow-button>
+    </div>
+
+    <div class="space-y-3" *ngIf="alarms().length > 0; else emptyTpl">
+      <div class="p-4 glass rounded-xl border border-dark-700/50" *ngFor="let alarm of alarms()">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-dark-500">{{ alarm.timestamp | date:'medium' }}</span>
+            <span class="badge" 
+                  [class.badge-info]="alarm.severity === 'LOW'"
+                  [class.badge-warning]="alarm.severity === 'MEDIUM'"
+                  [class.badge-error]="alarm.severity === 'HIGH' || alarm.severity === 'CRITICAL'">
+              {{ alarm.severity }}
+            </span>
+            <span class="text-xs text-dark-400 font-mono bg-dark-900/50 px-2 py-1 rounded">{{ alarm.code }}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-xs text-green-400" *ngIf="alarm.acknowledged">
+              ✅ Acquitté¬°e
+            </div>
+            <flow-button variant="primary" (clicked)="acknowledge(alarm.id)" *ngIf="!alarm.acknowledged">
+              ✓ Acquitter
+            </flow-button>
+          </div>
+        </div>
+        <div class="text-dark-200 text-sm">{{ alarm.message }}</div>
       </div>
     </div>
+
+    <ng-template #emptyTpl>
+      <div class="flex flex-col items-center justify-center py-12 text-dark-400">
+        <span class="text-4xl mb-4">✨</span>
+        <p>Aucune alarme</p>
+      </div>
+    </ng-template>
+  </flow-card>
+
+  <div class="p-4 glass rounded-xl border border-red-500/30" *ngIf="error()">
+    <div class="flex items-center gap-3">
+      <span class="text-xl">⚠️</span>
+      <span class="text-red-300">{{ error() }}</span>
+    </div>
   </div>
-
-  <ng-template #emptyTpl>
-    <p>Aucune alarme.</p>
-  </ng-template>
-</flow-card>
-
-<div class="error-msg" *ngIf="error()">
-  {{ error() }}
 </div>
