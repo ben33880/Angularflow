@@ -2,17 +2,29 @@
 
 Application Angular 22+ (standalone, signals, zoneless) pour piloter un contrôleur Flow.io-Waveshare.
 
-![Dashboard](https://via.placeholder.com/800x450/0f172a/3b82f6?text=Dashboard+Flow.io)
-
 ## Stack
 
 - **Angular 22+** : standalone components, signals, zoneless
-- **Bootstrap 5** : UI framework
 - **HttpClient** + interceptors
+- **Bootstrap 5** + custom dark theme
 - **Stores légers** (pattern signal-based)
 - **Docker** (nginx, Node 26) pour le déploiement
 
-## Dé ¬marrage local
+## Screenshots
+
+### Dashboard
+
+![Dashboard](flowio-dashboard-mockup.png)
+
+### Configuration
+
+![Configuration](flowio-config-mockup.png)
+
+### Logs
+
+![Logs](flowio-logs-mockup.png)
+
+## Démarrage local
 
 ```bash
 cd frontend
@@ -54,7 +66,8 @@ Puis ouvrir http://localhost:8080
 - **Components** : standalone, OnPush, DestroyRef pour cleanup
 - **State** : signals + computed, pas de mutable state
 - **Services** : HttpClient, typage fort
-- **Stores** : pattern lé ¬ger (pas de NgRx)
+- **Stores** : pattern léger (pas de NgRx)
+- **UI** : Bootstrap 5 + custom dark theme avec animations
 
 ## Best practices
 
@@ -63,23 +76,4 @@ Puis ouvrir http://localhost:8080
 - Interceptors pour API prefix + error handling
 - Guards pour device connectivity
 - Lazy loading des features
-
-## Screenshots
-
-### Dashboard
-
-![Dashboard](https://via.placeholder.com/800x450/0f172a/3b82f6?text=Dashboard+-+Statistiques+piscine)
-
-### Configuration
-
-![Config](https://via.placeholder.com/800x450/0f172a/8b5cf6?text=Configuration+-+Ré¬°seau+MQTT)
-
-### Logs
-
-![Logs](https://via.placeholder.com/800x450/0f172a/10b981?text=Logs+-+Journaux+d'é¬°vé¬®nements)
-
-### Alarmes
-
-![Alarmes](https://via.placeholder.com/800x450/0f172a/ef4444?text=Alarmes+-+Supervision)
-
-> Remplace les placeholders par de vrais screenshots après avoir lancé l'appli
+- Dark theme moderne avec glassmorphism
