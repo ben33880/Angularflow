@@ -1,153 +1,145 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { WebsocketService } from '../../services/websocket.service';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="nav">
-      <div class="nav-brand">
-        <div class="brand-icon">◈</div>
+    <nav class="sidebar">
+      <div class="sidebar-brand">
+        <i class="bi bi-water"></i>
         <span>Flow.io</span>
       </div>
-      <div class="nav-links">
-        <a routerLink="/dashboard" routerLinkActive="active">
-          <span class="icon">◧</span>
-          Dashboard
+      <div class="sidebar-menu">
+        <a routerLink="/dashboard" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
         </a>
-        <a routerLink="/config" routerLinkActive="active">
-          <span class="icon">⚙</span>
-          Config
+        <a routerLink="/config" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-gear"></i>
+          <span>Config</span>
         </a>
-        <a routerLink="/logs" routerLinkActive="active">
-          <span class="icon">📋</span>
-          Logs
+        <a routerLink="/logs" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-journal-text"></i>
+          <span>Logs</span>
         </a>
-        <a routerLink="/alarms" routerLinkActive="active">
-          <span class="icon">⚠</span>
-          Alarmes
+        <a routerLink="/alarms" routerLinkActive="active" class="sidebar-link">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span>Alarmes</span>
         </a>
       </div>
-      <div class="nav-footer">
-        <div class="status-indicator"></div>
-        <span class="status-text">Connecté·ª</span>
+      <div class="sidebar-footer">
+        <div class="status-badge" [class.ws-connected]="wsConnected()">
+          <span class="status-dot"></span>
+          <span>{{ wsConnected() ? 'WebSocket connecté' : 'En ligne (HTTP)' }}</span>
+        </div>
       </div>
     </nav>
   `,
   styles: [`
-    .nav {
+    .sidebar {
       width: 260px;
-      background: rgba(15, 23, 42, 0.8);
-      backdrop-filter: blur(12px);
-      border-right: 1px solid var(--border);
-      padding: 24px 16px;
+      background: var(--bg-secondary);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      padding: 1.5rem;
       position: fixed;
       height: 100vh;
-      overflow: hidden;
+      z-index: 100;
     }
-    .nav-brand {
+    .sidebar-brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px;
-      background: var(--accent-gradient);
-      border-radius: var(--radius);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: white;
-      box-shadow: var(--shadow-lg);
-    }
-    .brand-icon {
+      gap: 0.75rem;
       font-size: 1.5rem;
-      animation: pulse 2s infinite;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .nav-links {
+    .sidebar-brand i {
+      font-size: 2rem;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sidebar-menu {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 0.5rem;
       flex: 1;
     }
-    .nav-links a {
+    .sidebar-link {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
       color: var(--text-secondary);
       text-decoration: none;
-      border-radius: var(--radius-sm);
-      transition: var(--transition);
+      border-radius: 0.75rem;
+      transition: all 0.2s;
       font-weight: 500;
-      position: relative;
-      overflow: hidden;
     }
-    .nav-links a::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 3px;
-      height: 100%;
-      background: var(--accent-gradient);
-      transform: scaleY(0);
-      transition: transform 0.3s ease;
+    .sidebar-link i {
+      font-size: 1.25rem;
     }
-    .nav-links a:hover {
+    .sidebar-link:hover {
       background: rgba(59, 130, 246, 0.1);
       color: var(--text-primary);
-      transform: translateX(4px);
     }
-    .nav-links a:hover::before {
-      transform: scaleY(1);
+    .sidebar-link.active {
+      background: var(--gradient-primary);
+      color: white;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
     }
-    .nav-links a.active {
-      background: rgba(59, 130, 246, 0.15);
-      color: var(--text-primary);
-      border-left: 3px solid var(--accent-primary);
+    .sidebar-footer {
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
-    .nav-links a.active::before {
-      transform: scaleY(1);
-    }
-    .icon {
-      font-size: 1.25rem;
-      width: 24px;
-      text-align: center;
-    }
-    .nav-footer {
+    .status-badge {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 12px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.2);
-      border-radius: var(--radius-sm);
+      gap: 0.5rem;
       font-size: 0.875rem;
+      color: var(--text-secondary);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      transition: all 0.3s;
+    }
+    .status-badge.ws-connected {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
       color: var(--success);
     }
-    .status-indicator {
+    .status-dot {
       width: 8px;
       height: 8px;
       background: var(--success);
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
-    .status-text {
-      font-weight: 500;
+    .status-badge.ws-connected .status-dot {
+      background: var(--success);
+      box-shadow: 0 0 10px var(--success);
     }
     @keyframes pulse {
       0%, 100% {
         opacity: 1;
-        transform: scale(1);
       }
       50% {
         opacity: 0.5;
-        transform: scale(1.1);
       }
     }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavComponent {}
+export class NavComponent {
+  private readonly ws = inject(WebsocketService);
+  readonly wsConnected = this.ws.connected;
+}

@@ -18,7 +18,8 @@
     "@angular/platform-browser-dynamic": "^22.0.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "rxjs-websockets": "^8.0.0"
   },
   "devDependencies": {
     "@angular/cli": "^22.0.0",

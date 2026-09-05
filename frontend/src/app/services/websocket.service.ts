@@ -1,86 +1,64 @@
-import { inject, Injectable, signal, computed } from '@angular/core';
-import { Observable, Subject, share, filter, takeWhile, retryWhen, delayWhen, timer } from 'rxjs';
+import { inject, Injectable, signal, Signal } from '@angular/core';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { Observable, share, retry, tap, catchError, of, Subject } from 'rxjs';
 import { environment } from '../../environments/environment';
 import type { PoolStatus, LogEntry, AlarmEntry } from '../models/flowio.models';
 
 export interface WsMessage {
   type: 'pool_status' | 'log' | 'alarm' | 'heartbeat';
   data: PoolStatus | LogEntry | AlarmEntry | { timestamp: number };
-  timestamp: number;
 }
 
 @Injectable({ providedIn: 'root' })
-export class WebSocketService {
-  private wsSubject$?: WebSocketSubject<WsMessage>;
+export class WebsocketService {
+  private wsSubject?: WebSocketSubject<WsMessage>;
+  private readonly reconnectSubject = new Subject<void>();
+  
+  private readonly connectedSignal = signal(false);
+  readonly connected: Signal<boolean> = this.connectedSignal.asReadonly();
+  
   private readonly messagesSubject = new Subject<WsMessage>();
-  private isConnectedSignal = signal(false);
-  private lastMessageSignal = signal<WsMessage | null>(null);
-
-  readonly isConnected = computed(() => this.isConnectedSignal());
-  readonly lastMessage = computed(() => this.lastMessageSignal());
-
-  connect(): Observable<WsMessage> {
-    const wsUrl = environment.flowioBaseUrl.replace('http', 'ws') + '/ws';
-
-    this.wsSubject$ = webSocket<WsMessage>({
-      url: wsUrl,
-      openObserver: {
-        next: () => {
-          console.log('WebSocket connected');
-          this.isConnectedSignal.set(true);
+  readonly messages$: Observable<WsMessage> = this.messagesSubject.asObservable();
+  
+  private readonly wsUrl = environment.flowioBaseUrl.replace('http', 'ws') + '/ws';
+  
+  connect(): void {
+    this.wsSubject = webSocket<WsMessage>(this.wsUrl);
+    
+    this.wsSubject
+      .pipe(
+        share(),
+        retry({ delay: 3000 }),
+        tap({
+          connect: () => this.connectedSignal.set(true),
+          error: () => this.connectedSignal.set(false)
+        }),
+        catchError(() => {
+          this.connectedSignal.set(false);
+          return of();
+        })
+      )
+      .subscribe({
+        next: (msg) => this.messagesSubject.next(msg),
+        error: (err) => {
+          console.error('WebSocket error:', err);
+          this.connectedSignal.set(false);
+          this.reconnectSubject.next();
         }
-      },
-      closeObserver: {
-        next: () => {
-          console.log('WebSocket disconnected');
-          this.isConnectedSignal.set(false);
-        }
-      }
-    });
-
-    return this.wsSubject$.pipe(
-      share(),
-      retryWhen(errors =>
-        errors.pipe(
-          delayWhen(() => timer(3000)),
-          takeWhile(() => true)
-        )
-      ),
-      filter(msg => {
-        this.lastMessageSignal.set(msg);
-        return true;
-      })
-    );
+      });
   }
-
-  getPoolStatusUpdates(): Observable<PoolStatus> {
-    return this.connect().pipe(
-      filter(msg => msg.type === 'pool_status'),
-      map(msg => msg.data as PoolStatus)
-    );
-  }
-
-  getLogUpdates(): Observable<LogEntry> {
-    return this.connect().pipe(
-      filter(msg => msg.type === 'log'),
-      map(msg => msg.data as LogEntry)
-    );
-  }
-
-  getAlarmUpdates(): Observable<AlarmEntry> {
-    return this.connect().pipe(
-      filter(msg => msg.type === 'alarm'),
-      map(msg => msg.data as AlarmEntry)
-    );
-  }
-
+  
   disconnect(): void {
-    if (this.wsSubject$) {
-      this.wsSubject$.complete();
-      this.isConnectedSignal.set(false);
+    if (this.wsSubject) {
+      this.wsSubject.complete();
+      this.wsSubject = undefined;
+      this.connectedSignal.set(false);
+    }
+  }
+  
+  sendMessage(type: string, data: any): void {
+    if (this.wsSubject && this.connectedSignal()) {
+      this.wsSubject.next({ type, data });
     }
   }
 }
-
-import { map } from 'rxjs/operators';
