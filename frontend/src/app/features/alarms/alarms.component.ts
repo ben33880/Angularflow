@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { FlowioApiService } from '../../services/flowio-api.service';
+import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
 import type { AlarmEntry } from '../../models/flowio.models';
@@ -15,32 +16,48 @@ import type { AlarmEntry } from '../../models/flowio.models';
 })
 export class AlarmsComponent implements OnInit {
   private readonly api = inject(FlowioApiService);
+  private readonly mqtt = inject(MqttService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly alarmsSignal = signal<AlarmEntry[]>([]);
   readonly alarms = computed(() => this.alarmsSignal());
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
-  readonly unackCount = computed(() =>
-    this.alarmsSignal().filter(a => !a.acknowledged).length
-  );
+  readonly mqttConnected = this.mqtt.connected;
+
+  constructor() {
+    // Subscribe to MQTT alarms
+    this.mqtt.alarms$.subscribe(alarms => {
+      if (Array.isArray(alarms)) {
+        this.alarmsSignal.set(alarms);
+      }
+    });
+  }
 
   ngOnInit(): void {
+    this.mqtt.connect();
     this.load();
+    this.destroyRef.onDestroy(() => this.mqtt.disconnect());
   }
 
   load(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.api.getAlarms().subscribe({
-      next: (a) => {
-        this.alarmsSignal.set(a);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        this.error.set(err?.message ?? 'Erreur de chargement');
-        this.loading.set(false);
-      }
-    });
+    
+    if (!this.mqttConnected()) {
+      this.api.getAlarms().subscribe({
+        next: (a) => {
+          this.alarmsSignal.set(a);
+          this.loading.set(false);
+        },
+        error: (err) => {
+          this.error.set(err?.message ?? 'Erreur de chargement');
+          this.loading.set(false);
+        }
+      });
+    } else {
+      this.loading.set(false);
+    }
   }
 
   severityClass(severity: string): string {
@@ -48,6 +65,10 @@ export class AlarmsComponent implements OnInit {
   }
 
   acknowledge(id: string): void {
-    this.api.acknowledgeAlarm(id).subscribe(() => this.load());
+    this.mqtt.publish(`flowio/cmd/alarms/${id}/ack`, {});
+  }
+
+  acknowledgeAll(): void {
+    this.mqtt.publish('flowio/cmd/alarms/ack_all', {});
   }
 }

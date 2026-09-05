@@ -1,11 +1,18 @@
 import { Injectable, signal, Signal, DestroyRef, inject } from '@angular/core';
 import { MqttClient, MqttConnectionOptions } from 'mqtt';
-import { Observable, Subject, share, filter, map } from 'rxjs';
+import { Observable, Subject, share, filter, map, ReplaySubject } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface MqttMessage {
   topic: string;
   payload: any;
+}
+
+export interface SystemStatus {
+  uptime: number;
+  memory: { free: number; total: number; percent: number };
+  wifi: { rssi: number; quality: number };
+  mqtt: { connected: boolean; messages: number };
 }
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +26,7 @@ export class MqttService {
   
   readonly messages$: Observable<MqttMessage> = this.messagesSubject.asObservable().pipe(share());
   
-  // Topics
+  // Pool status
   readonly poolStatus$ = this.messages$.pipe(
     filter(m => m.topic === 'flowio/pool/status'),
     map(m => m.payload)
@@ -35,31 +42,76 @@ export class MqttService {
     map(m => m.payload)
   );
   
+  // Devices
   readonly relays$ = this.messages$.pipe(
     filter(m => m.topic === 'flowio/devices/relays'),
     map(m => m.payload)
   );
   
+  readonly inputs$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/devices/inputs'),
+    map(m => m.payload)
+  );
+  
+  // Alarms
   readonly alarms$ = this.messages$.pipe(
     filter(m => m.topic === 'flowio/alarms/active'),
     map(m => m.payload)
   );
   
-  readonly logs$ = this.messages$.pipe(
-    filter(m => m.topic.startsWith('flowio/logs/')),
+  readonly alarmsHistory$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/alarms/history'),
     map(m => m.payload)
   );
   
-  readonly system$ = this.messages$.pipe(
-    filter(m => m.topic.startsWith('flowio/system/')),
+  // Logs (streaming)
+  readonly logsInfo$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/logs/info'),
+    map(m => m.payload)
+  );
+  
+  readonly logsWarn$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/logs/warn'),
+    map(m => m.payload)
+  );
+  
+  readonly logsError$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/logs/error'),
+    map(m => m.payload)
+  );
+  
+  // System monitoring
+  readonly systemUptime$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/system/uptime'),
+    map(m => m.payload)
+  );
+  
+  readonly systemMemory$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/system/memory'),
+    map(m => m.payload)
+  );
+  
+  readonly systemWifi$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/system/wifi'),
+    map(m => m.payload)
+  );
+  
+  readonly systemMqtt$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/system/mqtt'),
+    map(m => m.payload)
+  );
+  
+  // Config
+  readonly config$ = this.messages$.pipe(
+    filter(m => m.topic === 'flowio/config/full'),
     map(m => m.payload)
   );
   
   connect(): void {
-    const brokerUrl = environment.flowioBaseUrl.replace('http', 'ws').replace('https', 'wss');
+    const brokerHost = environment.flowioBaseUrl.replace('http://', '').replace('https://', '').split('/')[0];
     
     const options: MqttConnectionOptions = {
-      host: brokerUrl.replace('ws://', '').replace('wss://', '').split('/')[0],
+      host: brokerHost,
       port: 1883,
       protocol: 'ws',
       path: '/mqtt',
@@ -109,8 +161,15 @@ export class MqttService {
       'flowio/devices/relays',
       'flowio/devices/inputs',
       'flowio/alarms/active',
-      'flowio/logs/+',
-      'flowio/system/+'
+      'flowio/alarms/history',
+      'flowio/logs/info',
+      'flowio/logs/warn',
+      'flowio/logs/error',
+      'flowio/system/uptime',
+      'flowio/system/memory',
+      'flowio/system/wifi',
+      'flowio/system/mqtt',
+      'flowio/config/full'
     ];
     
     this.client.subscribe(topics, { qos: 1 }, (err) => {
@@ -158,5 +217,10 @@ export class MqttService {
   
   reboot(): void {
     this.publish('flowio/cmd/system/reboot', {});
+  }
+  
+  // Request full config
+  requestConfig(): void {
+    this.publish('flowio/cmd/config/get', {});
   }
 }
