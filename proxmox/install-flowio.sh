@@ -20,12 +20,15 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# 1. Update
 log_info "Mise à jour du système..."
 apt update && apt upgrade -y
 
+# 2. Dependencies
 log_info "Installation des dépendances..."
 apt install -y curl git ca-certificates gnupg lsb-release ufw
 
+# 3. Docker
 log_info "Installation de Docker..."
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -35,6 +38,7 @@ apt update
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 log_info "Docker $(docker --version) installé"
 
+# 4. Firewall
 log_info "Configuration firewall..."
 ufw --force enable
 ufw default deny incoming
@@ -43,10 +47,12 @@ ufw allow 80/tcp
 ufw allow 1883/tcp
 ufw allow 22/tcp
 
+# 5. Create directory
 log_info "Cré·§ation de /opt/flowio..."
 mkdir -p /opt/flowio
 cd /opt/flowio
 
+# 6. Clone or create
 log_info "Ré§°cupé·§ration Flow.io..."
 if git clone https://github.com/ben33880/Angularflow.git . 2>/dev/null; then
     log_info "Repository cloné·§"
@@ -82,26 +88,19 @@ EOF
     echo -e "listener 1883\nallow_anonymous true\n\nlistener 9001\nprotocol websockets\nallow_anonymous true" > mosquitto/config/mosquitto.conf
 fi
 
+# 7. Enable Docker
 log_info "Activation Docker..."
 systemctl enable --now docker
 
+# 8. Done
 log_info "Installation terminé § §e !"
 echo ""
 echo "======================================="
-echo "  IMPORTANT - Configurer MQTT"
+echo "  Accè§°s"
 echo "======================================="
 echo ""
-echo "1. Modifier config MQTT :"
-echo "   cd /opt/flowio"
-echo "   nano config.json"
-echo "   # Changer broker, port, user, password"
-echo ""
-echo "2. Lancer Flow.io :"
-echo "   docker compose up -d"
-echo ""
-echo "3. Accé§°der :"
-echo "   http://$(hostname -I | awk '{print $1}')"
+echo "  http://$(hostname -I | awk '{print $1}')"
 echo ""
 echo "======================================="
 echo ""
-log_info "N'oubliez pas de modifier config.json avant de lancer !"
+log_info "Ouvrez l'URL ci-dessus pour configurer et utiliser Flow.io"
