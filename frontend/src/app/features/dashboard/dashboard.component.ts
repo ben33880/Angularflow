@@ -4,19 +4,24 @@ import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
+import { SkeletonComponent } from '../../shared/ui/skeleton.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
+import { BadgeComponent } from '../../shared/ui/badge.component';
+import { ToastService } from '../../shared/ui/toast.service';
 import { TemperaturePipe } from '../../shared/pipes/temperature.pipe';
 import type { PoolStatus, PoolTemperatures, PoolChemistry, SystemStatus } from '../../models/flowio.models';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, CardComponent, StatCardComponent, ButtonComponent, TemperaturePipe],
+  imports: [NgIf, CardComponent, StatCardComponent, ButtonComponent, SkeletonComponent, EmptyStateComponent, BadgeComponent, TemperaturePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
   private readonly mqtt = inject(MqttService);
+  private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly statusSignal = signal<PoolStatus | null>(null);
@@ -29,7 +34,7 @@ export class DashboardComponent implements OnInit {
   readonly chemistry = computed(() => this.chemistrySignal());
   readonly system = computed(() => this.systemSignal());
   
-  readonly loading = signal(false);
+  readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly mqttConnected = this.mqtt.connected;
 
@@ -38,7 +43,6 @@ export class DashboardComponent implements OnInit {
   readonly orp = computed(() => this.chemistrySignal()?.orp ?? this.statusSignal()?.orp ?? null);
 
   constructor() {
-    // Subscribe to ALL MQTT topics
     this.mqtt.poolStatus$.subscribe(status => {
       if (status) {
         this.statusSignal.set(status);
@@ -51,7 +55,10 @@ export class DashboardComponent implements OnInit {
     });
     
     this.mqtt.chemistry$.subscribe(chem => {
-      if (chem) this.chemistrySignal.set(chem);
+      if (chem) {
+        this.chemistrySignal.set(chem);
+        this.checkAlerts();
+      }
     });
     
     this.mqtt.systemStatus$.subscribe(sys => {
@@ -61,19 +68,37 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.mqtt.connect();
-    this.loading.set(true);
     this.destroyRef.onDestroy(() => this.mqtt.disconnect());
   }
 
+  private checkAlerts(): void {
+    const ph = this.ph();
+    const orp = this.orp();
+    
+    if (ph !== null && (ph < 7.0 || ph > 7.6)) {
+      this.toast.warning(`pH: ${ph} - Hors plage recommandÃ©e (7.0-7.6)`);
+    }
+    
+    if (orp !== null && orp < 650) {
+      this.toast.info(`ORP: ${orp} mV - Niveau bas`);
+    }
+  }
+
   toggleFiltration(): void {
-    this.mqtt.setFiltration(!this.statusSignal()?.filtrationOn);
+    const newState = !this.statusSignal()?.filtrationOn;
+    this.mqtt.setFiltration(newState);
+    this.toast.success(newState ? 'Filtration dÃ©marrÃ©e' : 'Filtration arrÃªtÃ©e');
   }
 
   toggleChlorine(): void {
-    this.mqtt.setChlorine(!this.statusSignal()?.chlorineDosingOn);
+    const newState = !this.statusSignal()?.chlorineDosingOn;
+    this.mqtt.setChlorine(newState);
+    this.toast.success(newState ? 'Chlore activÃ©' : 'Chlore dÃ©sactivÃ©');
   }
 
   togglePh(): void {
-    this.mqtt.setPhDosing(!this.statusSignal()?.phDosingOn);
+    const newState = !this.statusSignal()?.phDosingOn;
+    this.mqtt.setPhDosing(newState);
+    this.toast.success(newState ? 'pH activÃ©' : 'pH dÃ©sactivÃ©');
   }
 }
