@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { NgIf, NgClass } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
@@ -14,7 +14,7 @@ import type { PoolStatus, PoolTemperatures, PoolChemistry, SystemStatus } from '
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, CardComponent, StatCardComponent, ButtonComponent, SkeletonComponent, EmptyStateComponent, BadgeComponent, TemperaturePipe],
+  imports: [NgIf, NgClass, CardComponent, StatCardComponent, ButtonComponent, SkeletonComponent, EmptyStateComponent, BadgeComponent, TemperaturePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
