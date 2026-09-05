@@ -14,99 +14,61 @@ echo ""
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
-# Fonctions
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
+log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Vérifier root
 if [ "$EUID" -ne 0 ]; then
     log_error "Ce script doit être exé§°cuté·§ en root"
     exit 1
 fi
 
-# 1. Mettre à jour le système
+# 1. Update
 log_info "Mise à jour du système..."
 apt update && apt upgrade -y
 
-# 2. Installer les dépendances
+# 2. Dependencies
 log_info "Installation des dépendances..."
-apt install -y \
-    curl \
-    git \
-    ca-certificates \
-    gnupg \
-    lsb-release \
-    ufw
+apt install -y curl git ca-certificates gnupg lsb-release ufw
 
-# 3. Installer Docker
+# 3. Docker
 log_info "Installation de Docker..."
-
-# Ajouter la clé GPG officielle de Docker
 install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Ajouter le repository Docker
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-# Installer Docker
 apt update
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-# Vérifier Docker
-if ! docker --version > /dev/null 2>&1; then
-    log_error "Docker n'a pas été installé correctement"
-    exit 1
-fi
-
 log_info "Docker $(docker --version) installé"
 
-# 4. Docker Compose (plugin inclus)
-log_info "Docker Compose plugin déjà inclus avec Docker CE"
-
-# 5. Configurer le firewall (optionnel)
+# 4. Firewall
 log_info "Configuration du firewall (UFW)..."
-
 ufw --force enable
 ufw default deny incoming
 ufw default allow outgoing
+ufw allow 80/tcp
+ufw allow 1883/tcp
+ufw allow 22/tcp
+log_info "Firewall configuré·§ - Ports: 80, 1883, 22"
 
-# Ports Flow.io
-ufw allow 80/tcp      # Frontend web
-ufw allow 1883/tcp    # MQTT
-ufw allow 22/tcp      # SSH (garder pour accè§°s)
-
-log_info "Firewall configuré·§ - Ports ouverts: 80, 1883, 22"
-
-# 6. Créer le dossier Flow.io
+# 5. Create directory
 log_info "Cré·§ation du dossier /opt/flowio..."
-
 mkdir -p /opt/flowio
 cd /opt/flowio
 
-# 7. Cloner le repo ou créer les fichiers de base
+# 6. Clone repo or create files
 log_info "Ré§°cupé·§ration des fichiers Flow.io..."
 
 if git clone https://github.com/ben33880/Angularflow.git . 2>/dev/null; then
-    log_info "Repository cloné·§ avec succès"
+    log_info "Repository cloné·§"
 else
-    log_warn "Impossible de cloner le repo, création des fichiers de base..."
+    log_warn "Clone échoué·§, création des fichiers..."
     
-    # Créer docker-compose.yml
     cat > docker-compose.yml << 'EOF'
 version: '3.8'
 
@@ -141,7 +103,6 @@ networks:
     driver: bridge
 EOF
 
-    # Créer config.json
     cat > config.json << 'EOF'
 {
   "mqtt": {
@@ -158,7 +119,6 @@ EOF
 }
 EOF
 
-    # Créer dossier Mosquitto
     mkdir -p mosquitto/config
     
     cat > mosquitto/config/mosquitto.conf << 'EOF'
@@ -171,47 +131,36 @@ allow_anonymous true
 EOF
 fi
 
-# 8. Activer Docker au boot
+# 7. Enable Docker
 log_info "Activation de Docker au boot..."
 systemctl enable docker
 systemctl start docker
 
-# 9. Afficher les infos
-log_info "Installation terminé § §e avec succès !"
+# 8. Done
+log_info "Installation terminé § §e !"
 echo ""
 echo "======================================="
 echo "  Prochaines é•tapes"
 echo "======================================="
 echo ""
-echo "1. Modifier la config MQTT :"
-echo "   cd /opt/flowio"
-echo "   nano config.json"
+echo "1. Modifier config MQTT :"
+echo "   cd /opt/flowio && nano config.json"
 echo ""
 echo "2. Lancer Flow.io :"
-echo "   cd /opt/flowio"
 echo "   docker compose up -d"
 echo ""
-echo "3. Accé§°der à l'interface :"
+echo "3. Accé§°der :"
 echo "   http://$(hostname -I | awk '{print $1}')"
-echo ""
-echo "4. MQTT WebSocket :"
-echo "   ws://$(hostname -I | awk '{print $1}'):1883/mqtt"
 echo ""
 echo "======================================="
 echo ""
 
-# Optionnel : Build et start automatique
-read -p "Voulez-vous lancer Flow.io maintenant ? (y/n) " -n 1 -r
+read -p "Lancer Flow.io maintenant ? (y/n) " -n 1 -r
 echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    log_info "Build et démarrage de Flow.io..."
-    cd /opt/flowio
+    log_info "Build et démarrage..."
     docker compose up -d --build
-    
-    echo ""
-    log_info "Flow.io est en ligne !"
-    echo "   Frontend: http://$(hostname -I | awk '{print $1}')"
-    echo "   MQTT: ws://$(hostname -I | awk '{print $1}'):1883/mqtt"
+    log_info "Flow.io en ligne : http://$(hostname -I | awk '{print $1}')"
 fi
 
 echo ""
