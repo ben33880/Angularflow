@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    environment:
+      - FLOWIO_DEVICE_IP=${FLOWIO_DEVICE_IP}
