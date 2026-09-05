@@ -1,0 +1,33 @@
+<h2 class="page-title">Alarmes</h2>
+
+<flow-card title="Liste des alarmes">
+  <div class="alarms-header">
+    <span>{{ alarms().length }} alarmes</span>
+    <flow-button variant="primary" (clicked)="load()">Rafraî®®chir</flow-button>
+  </div>
+
+  <div class="alarms-list" *ngIf="alarms().length > 0; else emptyTpl">
+    <div class="alarm-row" *ngFor="let alarm of alarms()">
+      <div class="alarm-meta">
+        <span class="alarm-time">{{ alarm.timestamp | date:'medium' }}</span>
+        <span class="alarm-severity" [class]="severityClass(alarm.severity)">{{ alarm.severity }}</span>
+        <span class="alarm-code">{{ alarm.code }}</span>
+      </div>
+      <div class="alarm-message">{{ alarm.message }}</div>
+      <div class="alarm-actions" *ngIf="!alarm.acknowledged">
+        <flow-button variant="primary" (clicked)="acknowledge(alarm.id)">Acquitter</flow-button>
+      </div>
+      <div class="alarm-ack" *ngIf="alarm.acknowledged">
+        <span>Acquitté¬°e</span>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyTpl>
+    <p>Aucune alarme.</p>
+  </ng-template>
+</flow-card>
+
+<div class="error-msg" *ngIf="error()">
+  {{ error() }}
+</div>

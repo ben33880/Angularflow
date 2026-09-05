@@ -1,0 +1,83 @@
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #111827;
+}
+.alarms-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+.alarms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.alarm-row {
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px;
+  background: #f9fafb;
+}
+.alarm-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 6px;
+}
+.alarm-time {
+  font-weight: 500;
+}
+.alarm-severity {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+.severity-low {
+  background: #dbeafe;
+  color: #1e40af;
+}
+.severity-medium {
+  background: #fef3c7;
+  color: #92400e;
+}
+.severity-high {
+  background: #fed7aa;
+  color: #9a3412;
+}
+.severity-critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.alarm-code {
+  font-family: monospace;
+  background: #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.alarm-message {
+  font-size: 0.875rem;
+  color: #1f2937;
+  margin-bottom: 6px;
+}
+.alarm-actions {
+  display: flex;
+  gap: 8px;
+}
+.alarm-ack {
+  font-size: 0.75rem;
+  color: #059669;
+  font-weight: 600;
+}
+.error-msg {
+  margin-top: 16px;
+  color: #dc2626;
+  font-size: 0.875rem;
+}

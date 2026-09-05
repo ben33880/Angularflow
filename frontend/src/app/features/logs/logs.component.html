@@ -1,0 +1,27 @@
+<h2 class="page-title">Logs</h2>
+
+<flow-card title="Journaux">
+  <div class="logs-header">
+    <span>{{ logs().length }} entré¬°es</span>
+    <flow-button variant="primary" (clicked)="load()">Rafraî®®chir</flow-button>
+  </div>
+
+  <div class="logs-list" *ngIf="logs().length > 0; else emptyTpl">
+    <div class="log-row" *ngFor="let log of logs()">
+      <div class="log-meta">
+        <span class="log-time">{{ log.timestamp | date:'medium' }}</span>
+        <span class="log-level" [class]="levelClass(log.level)">{{ log.level }}</span>
+        <span class="log-module" *ngIf="log.module">{{ log.module }}</span>
+      </div>
+      <div class="log-message">{{ log.message }}</div>
+    </div>
+  </div>
+
+  <ng-template #emptyTpl>
+    <p>Aucun log.</p>
+  </ng-template>
+</flow-card>
+
+<div class="error-msg" *ngIf="error()">
+  {{ error() }}
+</div>

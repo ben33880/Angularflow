@@ -1,0 +1,62 @@
+<h2 class="page-title">Configuration</h2>
+
+<flow-card title="Ré¬°seau & MQTT">
+  <div class="form" *ngIf="config(); else loadingTpl">
+    <label>
+      SSID Wi‑Fi
+      <input type="text" [ngModel]="config()!.wifiSsid"
+             (ngModelChange)="configSignal.update(c => c ? {...c, wifiSsid: $event} : c)" />
+    </label>
+
+    <label>
+      Mot de passe Wi‑Fi
+      <input type="password" [ngModel]="config()!.wifiPassword ?? ''"
+             (ngModelChange)="configSignal.update(c => c ? {...c, wifiPassword: $event} : c)" />
+    </label>
+
+    <div class="checkbox-row">
+      <input type="checkbox" [ngModel]="config()!.mqttEnabled"
+             (ngModelChange)="configSignal.update(c => c ? {...c, mqttEnabled: $event} : c)" />
+      <span>MQTT activé¬°</span>
+    </div>
+
+    <label>
+      Broker MQTT
+      <input type="text" [ngModel]="config()!.mqttBroker"
+             (ngModelChange)="configSignal.update(c => c ? {...c, mqttBroker: $event} : c)" />
+    </label>
+
+    <label>
+      Username MQTT
+      <input type="text" [ngModel]="config()!.mqttUsername ?? ''"
+             (ngModelChange)="configSignal.update(c => c ? {...c, mqttUsername: $event} : c)" />
+    </label>
+
+    <label>
+      Password MQTT
+      <input type="password" [ngModel]="config()!.mqttPassword ?? ''"
+             (ngModelChange)="configSignal.update(c => c ? {...c, mqttPassword: $event} : c)" />
+    </label>
+
+    <div class="actions">
+      <flow-button variant="primary" (clicked)="save()">
+        Enregistrer
+      </flow-button>
+      <flow-button (clicked)="load()">
+        Recharger
+      </flow-button>
+    </div>
+
+    <div class="success-msg" *ngIf="saved()">
+      Configuration enregistré¬°e
+    </div>
+  </div>
+
+  <ng-template #loadingTpl>
+    <p>Chargement…</p>
+  </ng-template>
+</flow-card>
+
+<div class="error-msg" *ngIf="error()">
+  {{ error() }}
+</div>
