@@ -1,71 +1,81 @@
-<div class="space-y-8">
-  <div>
-    <h1 class="text-4xl font-bold text-gradient mb-2">🏊 Dashboard Piscine</h1>
-    <p class="text-dark-400">Supervision en temps réel de votre piscine</p>
+<div class="dashboard-header fade-in">
+  <h1 class="page-title">🏊 Dashboard Piscine</h1>
+  <p class="page-subtitle">Supervision en temps réel de votre installation</p>
+</div>
+
+<flow-card title="📊 État de la piscine" class="fade-in">
+  <div class="stats-grid" *ngIf="status(); else loadingTpl">
+    <flow-stat-card label="Tempé¬°rature" unit=" °C" icon="🌡️">
+      {{ temperature() | temperature }}
+    </flow-stat-card>
+    <flow-stat-card label="pH" icon="🧪">
+      {{ ph() ?? '–' }}
+    </flow-stat-card>
+    <flow-stat-card label="ORP" unit="mV" icon="⚡">
+      {{ orp() ?? '–' }}
+    </flow-stat-card>
+    <flow-stat-card label="Statut" icon="✅">
+      {{ status()!.filtrationOn ? 'Actif' : 'Inactif' }}
+    </flow-stat-card>
   </div>
-
-  <flow-card title="📈 État de la piscine">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" *ngIf="status(); else loadingTpl">
-      <flow-stat-card label="Tempé¬°rature" unit=" °C">
-        {{ temperature() | temperature }}
-      </flow-stat-card>
-      <flow-stat-card label="pH">
-        {{ ph() ?? '–' }}
-      </flow-stat-card>
-      <flow-stat-card label="ORP" unit="mV">
-        {{ orp() ?? '–' }}
-      </flow-stat-card>
+  <ng-template #loadingTpl>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement des donné­…es…</p>
     </div>
-    <ng-template #loadingTpl>
-      <div class="flex items-center justify-center py-12">
-        <div class="animate-pulse text-dark-400">Chargement…</div>
-      </div>
-    </ng-template>
-  </flow-card>
+  </ng-template>
+</flow-card>
 
-  <flow-card title="⚡ É‰quipements">
-    <div class="space-y-4" *ngIf="status(); else loadingTpl2">
-      <div class="flex items-center justify-between p-4 glass rounded-xl">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">💧</span>
-          <span class="font-semibold text-dark-200">Filtration</span>
-        </div>
-        <flow-button variant="primary" (clicked)="toggleFiltration()">
-          {{ status()!.filtrationOn ? '🔴 Arrêªªter' : '🟢 Dé­­marrer' }}
-        </flow-button>
+<flow-card title="⚙️ É­quipements" class="fade-in">
+  <div class="equipments-grid" *ngIf="status(); else loadingTpl2">
+    <div class="equipment-card">
+      <div class="equipment-icon">💧</div>
+      <div class="equipment-info">
+        <h4>Filtration</h4>
+        <p class="equipment-status" [class.status-on]="status()!.filtrationOn" [class.status-off]="!status()!.filtrationOn">
+          {{ status()!.filtrationOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
+        </p>
       </div>
-      
-      <div class="flex items-center justify-between p-4 glass rounded-xl">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🧪</span>
-          <span class="font-semibold text-dark-200">Dosage chlore</span>
-        </div>
-        <flow-button variant="primary" (clicked)="toggleChlorine()">
-          {{ status()!.chlorineDosingOn ? '🔴 Arrêªªter' : '🟢 Dé­­marrer' }}
-        </flow-button>
-      </div>
-      
-      <div class="flex items-center justify-between p-4 glass rounded-xl">
-        <div class="flex items-center gap-3">
-          <span class="text-2xl">🔬</span>
-          <span class="font-semibold text-dark-200">Dosage pH-</span>
-        </div>
-        <flow-button variant="primary" (clicked)="togglePh()">
-          {{ status()!.phDosingOn ? '🔴 Arrêªªter' : '🟢 Dé­­marrer' }}
-        </flow-button>
-      </div>
+      <flow-button variant="primary" (clicked)="toggleFiltration()">
+        {{ status()!.filtrationOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+      </flow-button>
     </div>
-    <ng-template #loadingTpl2>
-      <div class="flex items-center justify-center py-12">
-        <div class="animate-pulse text-dark-400">Chargement…</div>
-      </div>
-    </ng-template>
-  </flow-card>
 
-  <div class="p-4 glass rounded-xl border border-red-500/30" *ngIf="error()">
-    <div class="flex items-center gap-3">
-      <span class="text-xl">⚠️</span>
-      <span class="text-red-300">{{ error() }}</span>
+    <div class="equipment-card">
+      <div class="equipment-icon">🧴</div>
+      <div class="equipment-info">
+        <h4>Dosage chlore</h4>
+        <p class="equipment-status" [class.status-on]="status()!.chlorineDosingOn" [class.status-off]="!status()!.chlorineDosingOn">
+          {{ status()!.chlorineDosingOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
+        </p>
+      </div>
+      <flow-button variant="primary" (clicked)="toggleChlorine()">
+        {{ status()!.chlorineDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+      </flow-button>
+    </div>
+
+    <div class="equipment-card">
+      <div class="equipment-icon">🔬</div>
+      <div class="equipment-info">
+        <h4>Dosage pH-</h4>
+        <p class="equipment-status" [class.status-on]="status()!.phDosingOn" [class.status-off]="!status()!.phDosingOn">
+          {{ status()!.phDosingOn ? 'En marche' : 'Àª…rrêªªté¬°' }}
+        </p>
+      </div>
+      <flow-button variant="primary" (clicked)="togglePh()">
+        {{ status()!.phDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
+      </flow-button>
     </div>
   </div>
+  <ng-template #loadingTpl2>
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+      <p>Chargement des é­quipements…</p>
+    </div>
+  </ng-template>
+</flow-card>
+
+<div class="error-msg" *ngIf="error()">
+  <div class="error-icon">⚠️</div>
+  <div>{{ error() }}</div>
 </div>
