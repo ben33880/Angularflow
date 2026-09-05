@@ -1,0 +1,37 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>Flow.io</h1>
+      <div class="status-badge" [class.connected]="mqttConnected()">
+        <span class="status-dot"></span>
+        {{ mqttConnected() ? 'Connecté·§' : 'Dé§°connecté·§' }}
+      </div>
+    </div>
+
+    <nav class="nav">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="nav-item"
+        >
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="mqtt-info" *ngIf="isConfigured()">
+        <small>{{ mqttConfig().broker }}:{{ mqttConfig().port }}</small>
+      </div>
+      <button class="settings-btn" (click)="openSettings()" title="Configuration MQTT">
+        ⚙️
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>

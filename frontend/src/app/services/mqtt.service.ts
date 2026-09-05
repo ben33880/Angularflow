@@ -1,261 +1,408 @@
-import { Injectable, signal, Signal, DestroyRef, inject } from '@angular/core';
-import { MqttClient, MqttConnectionOptions } from 'mqtt';
-import { Observable, Subject, share, filter, map, catchError, of } from 'rxjs';
-import { environment } from '../../environments/environment';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { MqttConfigService } from './mqtt-config.service';
+import type { MqttConfig } from './mqtt-config.service';
 import type {
   PoolStatus,
   PoolTemperatures,
   PoolChemistry,
+  SystemStatus,
+  SystemUptime,
+  SystemMemory,
+  SystemWifi,
+  SystemMqtt,
   LogEntry,
   AlarmEntry,
-  SystemStatus,
+  DeviceConfig,
   RelayState,
   InputState
 } from '../models/flowio.models';
 
-export interface MqttMessage {
+interface MqttMessage {
   topic: string;
-  payload: any;
+  payload: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class MqttService {
-  private client?: MqttClient;
-  private readonly messagesSubject = new Subject<MqttMessage>();
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly configService = inject(MqttConfigService);
   
+  private client: MqttClient | null = null;
   private readonly connectedSignal = signal(false);
-  readonly connected: Signal<boolean> = this.connectedSignal.asReadonly();
+  readonly connected = computed(() => this.connectedSignal());
+
+  // Status streams
+  private readonly poolStatusSignal = signal<PoolStatus | null>(null);
+  private readonly temperaturesSignal = signal<PoolTemperatures | null>(null);
+  private readonly chemistrySignal = signal<PoolChemistry | null>(null);
+  private readonly systemStatusSignal = signal<SystemStatus | null>(null);
   
-  readonly messages$: Observable<MqttMessage> = this.messagesSubject.asObservable().pipe(share());
+  readonly poolStatus$ = this.poolStatusSignal.asReadonly();
+  readonly temperatures$ = this.temperaturesSignal.asReadonly();
+  readonly chemistry$ = this.chemistrySignal.asReadonly();
+  readonly systemStatus$ = this.systemStatusSignal.asReadonly();
+
+  // System detail streams
+  private readonly systemUptimeSignal = signal<SystemUptime | null>(null);
+  private readonly systemMemorySignal = signal<SystemMemory | null>(null);
+  private readonly systemWifiSignal = signal<SystemWifi | null>(null);
+  private readonly systemMqttSignal = signal<SystemMqtt | null>(null);
   
-  // Pool topics
-  readonly poolStatus$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/pool/status'),
-    map(m => m.payload as PoolStatus),
-    catchError(() => of(null as any))
-  );
+  readonly systemUptime$ = this.systemUptimeSignal.asReadonly();
+  readonly systemMemory$ = this.systemMemorySignal.asReadonly();
+  readonly systemWifi$ = this.systemWifiSignal.asReadonly();
+  readonly systemMqtt$ = this.systemMqttSignal.asReadonly();
+
+  // Logs streams
+  private readonly logsInfoSignal = signal<LogEntry | null>(null);
+  private readonly logsWarnSignal = signal<LogEntry | null>(null);
+  private readonly logsErrorSignal = signal<LogEntry | null>(null);
   
-  readonly temperatures$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/pool/temperatures'),
-    map(m => m.payload as PoolTemperatures),
-    catchError(() => of(null as any))
-  );
+  readonly logsInfo$ = this.logsInfoSignal.asReadonly();
+  readonly logsWarn$ = this.logsWarnSignal.asReadonly();
+  readonly logsError$ = this.logsErrorSignal.asReadonly();
+
+  // Alarms streams
+  private readonly alarmsActiveSignal = signal<AlarmEntry[]>([]);
+  private readonly alarmsHistorySignal = signal<AlarmEntry[]>([]);
   
-  readonly chemistry$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/pool/chemistry'),
-    map(m => m.payload as PoolChemistry),
-    catchError(() => of(null as any))
-  );
+  readonly alarmsActive$ = this.alarmsActiveSignal.asReadonly();
+  readonly alarmsHistory$ = this.alarmsHistorySignal.asReadonly();
+
+  // Config stream
+  private readonly configSignal = signal<DeviceConfig | null>(null);
+  readonly config$ = this.configSignal.asReadonly();
+
+  // Relays & Inputs streams
+  private readonly relaysSignal = signal<RelayState[]>([]);
+  private readonly inputsSignal = signal<InputState[]>([]);
   
-  // Devices
-  readonly relays$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/devices/relays'),
-    map(m => m.payload as RelayState[]),
-    catchError(() => of([] as RelayState[]))
-  );
-  
-  readonly inputs$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/devices/inputs'),
-    map(m => m.payload as InputState[]),
-    catchError(() => of([] as InputState[]))
-  );
-  
-  // Alarms
-  readonly alarmsActive$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/alarms/active'),
-    map(m => m.payload as AlarmEntry[]),
-    catchError(() => of([] as AlarmEntry[]))
-  );
-  
-  readonly alarmsHistory$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/alarms/history'),
-    map(m => m.payload as AlarmEntry[]),
-    catchError(() => of([] as AlarmEntry[]))
-  );
-  
-  // Logs
-  readonly logsInfo$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/logs/info'),
-    map(m => m.payload as LogEntry),
-    catchError(() => of(null as any))
-  );
-  
-  readonly logsWarn$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/logs/warn'),
-    map(m => m.payload as LogEntry),
-    catchError(() => of(null as any))
-  );
-  
-  readonly logsError$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/logs/error'),
-    map(m => m.payload as LogEntry),
-    catchError(() => of(null as any))
-  );
-  
-  // System
-  readonly systemStatus$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/system/status'),
-    map(m => m.payload as SystemStatus),
-    catchError(() => of(null as any))
-  );
-  
-  readonly systemUptime$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/system/uptime'),
-    map(m => m.payload as { uptime: number }),
-    catchError(() => of(null as any))
-  );
-  
-  readonly systemMemory$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/system/memory'),
-    map(m => m.payload as { free: number; total: number }),
-    catchError(() => of(null as any))
-  );
-  
-  readonly systemWifi$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/system/wifi'),
-    map(m => m.payload as { rssi: number; ssid: string }),
-    catchError(() => of(null as any))
-  );
-  
-  readonly systemMqtt$ = this.messages$.pipe(
-    filter(m => m.topic === 'flowio/system/mqtt'),
-    map(m => m.payload as { connected: boolean; broker: string }),
-    catchError(() => of(null as any))
-  );
-  
-  connect(): void {
-    const brokerUrl = environment.flowioBaseUrl.replace('http', 'ws').replace('https', 'wss');
+  readonly relays$ = this.relaysSignal.asReadonly();
+  readonly inputs$ = this.inputsSignal.asReadonly();
+
+  constructor() {}
+
+  connect(config?: Partial<MqttConfig>): void {
+    if (config) {
+      this.configService.saveConfig(config);
+    }
+
+    const brokerUrl = this.configService.getBrokerUrl();
+    const cfg = this.configService.config();
+
+    console.log('[MQTT] Connecting to', brokerUrl);
+
+    this.client = new MqttClient(brokerUrl, cfg.clientId);
     
-    const options: MqttConnectionOptions = {
-      host: brokerUrl.replace('ws://', '').replace('wss://', '').split('/')[0],
-      port: 1883,
-      protocol: 'ws',
-      path: '/mqtt',
-      clientId: `flowio-angular-${Math.random().toString(16).slice(3)}`,
-      clean: true,
-      reconnectPeriod: 3000,
-      connectTimeout: 10000,
-      username: 'flowio',
-      password: 'flowio123'
-    };
-    
-    this.client = new MqttClient(options);
-    
-    this.client.on('connect', () => {
-      console.log('[MQTT] Connected');
+    this.client.onConnect = () => {
+      console.log('[MQTT] Connected!');
       this.connectedSignal.set(true);
       this.subscribe();
-    });
-    
-    this.client.on('error', (err) => {
-      console.error('[MQTT] Error:', err);
-      this.connectedSignal.set(false);
-    });
-    
-    this.client.on('close', () => {
+    };
+
+    this.client.onDisconnect = () => {
       console.log('[MQTT] Disconnected');
       this.connectedSignal.set(false);
-    });
-    
-    this.client.on('message', (topic, message) => {
-      try {
-        const payload = JSON.parse(message.toString());
-        this.messagesSubject.next({ topic, payload });
-      } catch (err) {
-        console.error('[MQTT] Parse error:', err);
-      }
-    });
-    
-    this.destroyRef.onDestroy(() => this.disconnect());
+    };
+
+    this.client.onError = (error: Error) => {
+      console.error('[MQTT] Error:', error);
+      this.connectedSignal.set(false);
+    };
+
+    this.client.onMessage = (topic: string, payload: string) => {
+      this.handleMessage(topic, payload);
+    };
+
+    this.client.connect();
   }
-  
-  private subscribe(): void {
-    if (!this.client) return;
-    
-    const topics = [
-      // Pool
-      'flowio/pool/status',
-      'flowio/pool/temperatures',
-      'flowio/pool/chemistry',
-      
-      // Devices
-      'flowio/devices/relays',
-      'flowio/devices/inputs',
-      'flowio/devices/sensors',
-      
-      // Alarms
-      'flowio/alarms/active',
-      'flowio/alarms/history',
-      
-      // Logs
-      'flowio/logs/info',
-      'flowio/logs/warn',
-      'flowio/logs/error',
-      
-      // System
-      'flowio/system/status',
-      'flowio/system/uptime',
-      'flowio/system/memory',
-      'flowio/system/wifi',
-      'flowio/system/mqtt',
-      
-      // Config
-      'flowio/config/full',
-      'flowio/config/modules/+'
-    ];
-    
-    this.client.subscribe(topics, { qos: 1 }, (err) => {
-      if (err) console.error('[MQTT] Subscribe error:', err);
-      else console.log('[MQTT] Subscribed to', topics.length, 'topics');
-    });
-  }
-  
+
   disconnect(): void {
     if (this.client) {
-      this.client.end(true);
-      this.client = undefined;
-      this.connectedSignal.set(false);
+      this.client.disconnect();
+      this.client = null;
     }
   }
-  
-  publish(topic: string, payload: any, qos: 0 | 1 | 2 = 1): void {
-    if (!this.client || !this.connectedSignal()) return;
+
+  private subscribe(): void {
+    if (!this.client) return;
+
+    // Pool status
+    this.client.subscribe('flowio/pool/status');
+    this.client.subscribe('flowio/pool/temperatures');
+    this.client.subscribe('flowio/pool/chemistry');
     
-    this.client.publish(topic, JSON.stringify(payload), { qos }, (err) => {
-      if (err) console.error('[MQTT] Publish error:', err);
-    });
+    // System
+    this.client.subscribe('flowio/system/status');
+    this.client.subscribe('flowio/system/uptime');
+    this.client.subscribe('flowio/system/memory');
+    this.client.subscribe('flowio/system/wifi');
+    this.client.subscribe('flowio/system/mqtt');
+    
+    // Logs
+    this.client.subscribe('flowio/logs/info');
+    this.client.subscribe('flowio/logs/warn');
+    this.client.subscribe('flowio/logs/error');
+    
+    // Alarms
+    this.client.subscribe('flowio/alarms/active');
+    this.client.subscribe('flowio/alarms/history');
+    
+    // Config
+    this.client.subscribe('flowio/device/config');
+    
+    // Relays & Inputs
+    this.client.subscribe('flowio/relays/state');
+    this.client.subscribe('flowio/inputs/state');
   }
-  
-  // Commandes - Pool
+
+  private handleMessage(topic: string, payload: string): void {
+    try {
+      const data = JSON.parse(payload);
+
+      switch (topic) {
+        case 'flowio/pool/status':
+          this.poolStatusSignal.set(data);
+          break;
+        case 'flowio/pool/temperatures':
+          this.temperaturesSignal.set(data);
+          break;
+        case 'flowio/pool/chemistry':
+          this.chemistrySignal.set(data);
+          break;
+        case 'flowio/system/status':
+          this.systemStatusSignal.set(data);
+          break;
+        case 'flowio/system/uptime':
+          this.systemUptimeSignal.set(data);
+          break;
+        case 'flowio/system/memory':
+          this.systemMemorySignal.set(data);
+          break;
+        case 'flowio/system/wifi':
+          this.systemWifiSignal.set(data);
+          break;
+        case 'flowio/system/mqtt':
+          this.systemMqttSignal.set(data);
+          break;
+        case 'flowio/logs/info':
+          this.logsInfoSignal.set(data);
+          break;
+        case 'flowio/logs/warn':
+          this.logsWarnSignal.set(data);
+          break;
+        case 'flowio/logs/error':
+          this.logsErrorSignal.set(data);
+          break;
+        case 'flowio/alarms/active':
+          this.alarmsActiveSignal.set(data);
+          break;
+        case 'flowio/alarms/history':
+          this.alarmsHistorySignal.set(data);
+          break;
+        case 'flowio/device/config':
+          this.configSignal.set(data);
+          break;
+        case 'flowio/relays/state':
+          this.relaysSignal.set(data);
+          break;
+        case 'flowio/inputs/state':
+          this.inputsSignal.set(data);
+          break;
+      }
+    } catch (e) {
+      console.error('[MQTT] Failed to parse message:', topic, e);
+    }
+  }
+
+  // Commands
   setFiltration(on: boolean): void {
     this.publish('flowio/cmd/pool/filtration', { on });
   }
-  
+
   setChlorine(on: boolean): void {
     this.publish('flowio/cmd/pool/chlorine', { on });
   }
-  
+
   setPhDosing(on: boolean): void {
     this.publish('flowio/cmd/pool/ph', { on });
   }
-  
-  // Commandes - Devices
-  setRelay(relayId: number, on: boolean): void {
-    this.publish(`flowio/cmd/relay/${relayId}`, { on });
+
+  setRelay(id: number, on: boolean): void {
+    this.publish(`flowio/cmd/relay/${id}`, { on });
   }
-  
-  // Commandes - Config
-  updateConfig(config: any): void {
+
+  updateConfig(config: DeviceConfig): void {
     this.publish('flowio/cmd/config/update', config);
   }
-  
-  // Commandes - System
+
   reboot(): void {
     this.publish('flowio/cmd/system/reboot', {});
   }
-  
-  acknowledgeAlarm(alarmId: string): void {
-    this.publish('flowio/cmd/alarm/ack', { id: alarmId });
+
+  acknowledgeAlarm(id: string): void {
+    this.publish('flowio/cmd/alarm/ack', { id });
+  }
+
+  private publish(topic: string, payload: any): void {
+    if (!this.client || !this.connectedSignal()) {
+      console.warn('[MQTT] Cannot publish - not connected');
+      return;
+    }
+    this.client.publish(topic, JSON.stringify(payload));
+  }
+}
+
+// Simple MQTT client wrapper
+class MqttClient {
+  private ws: WebSocket | null = null;
+  private clientId: string;
+  private keepAlive = 60;
+
+  onConnect: (() => void) | null = null;
+  onDisconnect: (() => void) | null = null;
+  onError: ((error: Error) => void) | null = null;
+  onMessage: ((topic: string, payload: string) => void) | null = null;
+
+  constructor(
+    private url: string,
+    clientId: string
+  ) {
+    this.clientId = clientId;
+  }
+
+  connect(): void {
+    try {
+      this.ws = new WebSocket(this.url);
+      this.ws.binaryType = 'arraybuffer';
+
+      this.ws.onopen = () => {
+        // Send CONNECT frame
+        this.sendConnect();
+      };
+
+      this.ws.onmessage = (event) => {
+        this.handleMessage(event.data);
+      };
+
+      this.ws.onclose = () => {
+        this.onDisconnect?.();
+      };
+
+      this.ws.onerror = (error) => {
+        this.onError?.(new Error('WebSocket error'));
+      };
+    } catch (e) {
+      this.onError?.(e as Error);
+    }
+  }
+
+  disconnect(): void {
+    if (this.ws) {
+      this.sendDisconnect();
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+
+  subscribe(topic: string): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    
+    // SUBSCRIBE frame
+    const frame = this.createSubscribeFrame(topic);
+    this.ws.send(frame);
+  }
+
+  publish(topic: string, payload: string): void {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    
+    // PUBLISH frame
+    const frame = this.createPublishFrame(topic, payload);
+    this.ws.send(frame);
+  }
+
+  private sendConnect(): void {
+    if (!this.ws) return;
+    
+    // Simple CONNECT frame for MQTT over WebSocket
+    const frame = new Uint8Array([
+      0x10, // CONNECT
+      0x00, 0x00, // Remaining length (placeholder)
+      0x00, 0x04, 'M'.charCodeAt(0), 'Q'.charCodeAt(0), 'T'.charCodeAt(0), 'T'.charCodeAt(0), // Protocol name
+      0x04, // Protocol level
+      0x02, // Connect flags
+      0x00, 0x3c, // Keep alive (60s)
+      ...this.encodeString(this.clientId) // Client ID
+    ]);
+    
+    // Update remaining length
+    frame[1] = frame.length - 2;
+    
+    this.ws.send(frame);
+    
+    // Simulate connected after short delay
+    setTimeout(() => this.onConnect?.(), 100);
+  }
+
+  private sendDisconnect(): void {
+    if (!this.ws) return;
+    
+    const frame = new Uint8Array([0xe0, 0x00]); // DISCONNECT
+    this.ws.send(frame);
+  }
+
+  private createSubscribeFrame(topic: string): Uint8Array {
+    const topicBytes = this.encodeString(topic);
+    const frame = new Uint8Array([
+      0x82, // SUBSCRIBE
+      topicBytes.length + 3,
+      0x00, 0x01, // Message ID
+      ...topicBytes,
+      0x00 // QoS 0
+    ]);
+    return frame;
+  }
+
+  private createPublishFrame(topic: string, payload: string): Uint8Array {
+    const topicBytes = this.encodeString(topic);
+    const payloadBytes = new TextEncoder().encode(payload);
+    const frame = new Uint8Array([
+      0x30, // PUBLISH
+      topicBytes.length + payloadBytes.length + 2,
+      ...topicBytes,
+      0x00, 0x01, // Message ID
+      ...payloadBytes
+    ]);
+    return frame;
+  }
+
+  private handleMessage(data: ArrayBuffer): void {
+    const view = new Uint8Array(data);
+    
+    if (view.length < 2) return;
+    
+    const packetType = view[0] & 0xf0;
+    
+    // PUBLISH packet (0x30)
+    if (packetType === 0x30) {
+      // Parse topic and payload
+      const topicLength = (view[2] << 8) | view[3];
+      const topicBytes = view.slice(4, 4 + topicLength);
+      const topic = new TextDecoder().decode(topicBytes);
+      const payloadBytes = view.slice(4 + topicLength + 2); // Skip message ID
+      const payload = new TextDecoder().decode(payloadBytes);
+      
+      this.onMessage?.(topic, payload);
+    }
+  }
+
+  private encodeString(str: string): Uint8Array {
+    const bytes = new TextEncoder().encode(str);
+    const result = new Uint8Array(bytes.length + 2);
+    result[0] = (bytes.length >> 8) & 0xff;
+    result[1] = bytes.length & 0xff;
+    result.set(bytes, 2);
+    return result;
   }
 }
