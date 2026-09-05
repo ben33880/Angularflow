@@ -6,120 +6,145 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   template: `
-    <nav class="sidebar">
-      <div class="sidebar-brand">
-        <i class="bi bi-water"></i>
+    <nav class="nav">
+      <div class="nav-brand">
+        <div class="brand-icon">◈</div>
         <span>Flow.io</span>
       </div>
-      <div class="sidebar-menu">
-        <a routerLink="/dashboard" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-speedometer2"></i>
-          <span>Dashboard</span>
+      <div class="nav-links">
+        <a routerLink="/dashboard" routerLinkActive="active">
+          <span class="icon">◧</span>
+          Dashboard
         </a>
-        <a routerLink="/config" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-gear"></i>
-          <span>Config</span>
+        <a routerLink="/config" routerLinkActive="active">
+          <span class="icon">⚙</span>
+          Config
         </a>
-        <a routerLink="/logs" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-journal-text"></i>
-          <span>Logs</span>
+        <a routerLink="/logs" routerLinkActive="active">
+          <span class="icon">📋</span>
+          Logs
         </a>
-        <a routerLink="/alarms" routerLinkActive="active" class="sidebar-link">
-          <i class="bi bi-exclamation-triangle"></i>
-          <span>Alarmes</span>
+        <a routerLink="/alarms" routerLinkActive="active">
+          <span class="icon">⚠</span>
+          Alarmes
         </a>
       </div>
-      <div class="sidebar-footer">
-        <div class="status-badge">
-          <span class="status-dot"></span>
-          <span>En ligne</span>
-        </div>
+      <div class="nav-footer">
+        <div class="status-indicator"></div>
+        <span class="status-text">Connecté·ª</span>
       </div>
     </nav>
   `,
   styles: [`
-    .sidebar {
+    .nav {
       width: 260px;
-      background: var(--bg-secondary);
-      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(12px);
+      border-right: 1px solid var(--border);
+      padding: 24px 16px;
       display: flex;
       flex-direction: column;
-      padding: 1.5rem;
+      gap: 24px;
       position: fixed;
       height: 100vh;
-      z-index: 100;
+      overflow: hidden;
     }
-    .sidebar-brand {
+    .nav-brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      font-size: 1.5rem;
+      gap: 12px;
+      padding: 12px;
+      background: var(--accent-gradient);
+      border-radius: var(--radius);
+      font-size: 1.25rem;
       font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 2rem;
-      padding-bottom: 1.5rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      box-shadow: var(--shadow-lg);
     }
-    .sidebar-brand i {
-      font-size: 2rem;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .brand-icon {
+      font-size: 1.5rem;
+      animation: pulse 2s infinite;
     }
-    .sidebar-menu {
+    .nav-links {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 8px;
       flex: 1;
     }
-    .sidebar-link {
+    .nav-links a {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.875rem 1rem;
+      gap: 12px;
+      padding: 12px 16px;
       color: var(--text-secondary);
       text-decoration: none;
-      border-radius: 0.75rem;
-      transition: all 0.2s;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
       font-weight: 500;
+      position: relative;
+      overflow: hidden;
     }
-    .sidebar-link i {
-      font-size: 1.25rem;
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--accent-gradient);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
     }
-    .sidebar-link:hover {
+    .nav-links a:hover {
       background: rgba(59, 130, 246, 0.1);
       color: var(--text-primary);
+      transform: translateX(4px);
     }
-    .sidebar-link.active {
-      background: var(--gradient-primary);
-      color: white;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    .nav-links a:hover::before {
+      transform: scaleY(1);
     }
-    .sidebar-footer {
-      padding-top: 1.5rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    .nav-links a.active {
+      background: rgba(59, 130, 246, 0.15);
+      color: var(--text-primary);
+      border-left: 3px solid var(--accent-primary);
     }
-    .status-badge {
+    .nav-links a.active::before {
+      transform: scaleY(1);
+    }
+    .icon {
+      font-size: 1.25rem;
+      width: 24px;
+      text-align: center;
+    }
+    .nav-footer {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      border-radius: var(--radius-sm);
       font-size: 0.875rem;
-      color: var(--text-secondary);
+      color: var(--success);
     }
-    .status-dot {
+    .status-indicator {
       width: 8px;
       height: 8px;
       background: var(--success);
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
+    .status-text {
+      font-weight: 500;
+    }
     @keyframes pulse {
       0%, 100% {
         opacity: 1;
+        transform: scale(1);
       }
       50% {
         opacity: 0.5;
+        transform: scale(1.1);
       }
     }
   `],
