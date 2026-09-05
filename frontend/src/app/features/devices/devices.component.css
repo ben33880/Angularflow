@@ -1,0 +1,65 @@
+.page-title {
+  @apply flex items-center gap-4 text-4xl font-bold mb-8;
+  @apply bg-gradient-primary bg-clip-text;
+  -webkit-text-fill-color: transparent;
+}
+
+.devices-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.device-card {
+  @apply bg-white/5 rounded-xl border border-white/10 p-6;
+  @apply flex flex-col gap-4;
+  @apply transition-all duration-200;
+}
+
+.device-card:hover {
+  @apply bg-white/8 border-blue-500/30;
+}
+
+.device-header {
+  @apply flex items-center gap-4;
+}
+
+.device-header i {
+  @apply text-4xl text-accent-primary;
+}
+
+.device-header i.active {
+  @apply text-green-400;
+}
+
+.device-info {
+  @apply flex flex-col;
+}
+
+.device-name {
+  @apply font-semibold text-lg text-text-primary;
+}
+
+.device-id {
+  @apply text-sm text-text-secondary;
+}
+
+.device-status {
+  @apply flex items-center gap-2;
+  @apply text-sm text-text-secondary;
+}
+
+.device-status.status-on {
+  @apply text-green-400;
+}
+
+.device-status i {
+  @apply text-lg;
+}
+
+.empty-state {
+  @apply flex flex-col items-center justify-center p-12;
+  @apply text-text-secondary;
+}
+
+.empty-state i {
+  @apply text-6xl mb-4;
+}

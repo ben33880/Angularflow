@@ -1,0 +1,51 @@
+<h2 class="page-title">
+  <i class="bi bi-cpu"></i>
+  <span>&Eacute;quipements</span>
+</h2>
+
+<flow-card title="Relais" *ngIf="relays().length > 0">
+  <div class="devices-grid">
+    <div class="device-card" *ngFor="let relay of relays()">
+      <div class="device-header">
+        <i class="bi bi-plug" [class.active]="relay.on"></i>
+        <div class="device-info">
+          <div class="device-name">{{ relay.name }}</div>
+          <div class="device-id">Relais #{{ relay.id }}</div>
+        </div>
+      </div>
+      <div class="device-status" [class.status-on]="relay.on">
+        <i class="bi" [class.bi-lightning-charge-fill]="relay.on" [class.bi-lightning-charge]="!relay.on"></i>
+        <span>{{ relay.on ? 'Activ&eacute;' : 'D&eacute;sactiv&eacute;' }}</span>
+      </div>
+      <flow-button 
+        [variant]="relay.on ? 'secondary' : 'primary'" 
+        (clicked)="toggleRelay(relay.id, relay.on)">
+        <i class="bi" [class.bi-toggle-on]="relay.on" [class.bi-toggle-off]="!relay.on"></i>
+        {{ relay.on ? 'D&eacute;sactiver' : 'Activer' }}
+      </flow-button>
+    </div>
+  </div>
+</flow-card>
+
+<flow-card title="Entr&eacute;es num&eacute;riques" *ngIf="inputs().length > 0">
+  <div class="devices-grid">
+    <div class="device-card" *ngFor="let input of inputs()">
+      <div class="device-header">
+        <i class="bi bi-sign-turn-right" [class.active]="input.active"></i>
+        <div class="device-info">
+          <div class="device-name">{{ input.name }}</div>
+          <div class="device-id">Entr&eacute;e #{{ input.id }}</div>
+        </div>
+      </div>
+      <div class="device-status" [class.status-on]="input.active">
+        <i class="bi" [class.bi-check-circle-fill]="input.active" [class.bi-circle]="!input.active"></i>
+        <span>{{ input.active ? 'Actif' : 'Inactif' }}</span>
+      </div>
+    </div>
+  </div>
+</flow-card>
+
+<div class="empty-state" *ngIf="!mqttConnected()">
+  <i class="bi bi-wifi-off"></i>
+  <p>En attente de connexion MQTT...</p>
+</div>
