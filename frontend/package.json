@@ -17,17 +17,17 @@
     "@angular/platform-browser": "^22.0.0",
     "@angular/platform-browser-dynamic": "^22.0.0",
     "bootstrap-icons": "^1.11.3",
-    "rxjs": "^7.8.0",
-    "rxjs-websockets": "^8.0.0"
+    "mqtt": "^5.5.0",
+    "rxjs": "^7.8.0"
   },
   "devDependencies": {
     "@angular/cli": "^22.0.0",
     "@angular/compiler": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
     "@angular-devkit/build-angular": "^22.0.0",
-    "tailwindcss": "^3.4.3",
-    "postcss": "^8.4.38",
     "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
     "typescript": "~5.4.0"
   }
 }
