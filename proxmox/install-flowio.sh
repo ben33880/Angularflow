@@ -96,17 +96,20 @@ systemctl enable --now docker
 log_info "Installation terminé § §e !"
 echo ""
 echo "======================================="
-echo "  Prochaines é•tapes"
-echo "======================================="
-echo "1. Configurer: cd /opt/flowio && nano config.json"
-echo "2. Lancer: docker compose up -d"
-echo "3. Accé§°der: http://$(hostname -I | awk '{print $1}')"
+echo "  IMPORTANT - Configurer MQTT"
 echo "======================================="
 echo ""
-
-read -p "Lancer maintenant ? (y/n) " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    docker compose up -d --build
-    log_info "Flow.io en ligne: http://$(hostname -I | awk '{print $1}')"
-fi
+echo "1. Modifier config MQTT :"
+echo "   cd /opt/flowio"
+echo "   nano config.json"
+echo "   # Changer broker, port, user, password"
+echo ""
+echo "2. Lancer Flow.io :"
+echo "   docker compose up -d"
+echo ""
+echo "3. Accé§°der :"
+echo "   http://$(hostname -I | awk '{print $1}')"
+echo ""
+echo "======================================="
+echo ""
+log_info "N'oubliez pas de modifier config.json avant de lancer !"
