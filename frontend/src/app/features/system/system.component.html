@@ -1,77 +1,85 @@
 <h2 class="page-title">
-  <i class="bi bi-pc-display"></i>
-  <span>Syst&egrave;me</span>
+  <i class="bi bi-cpu"></i>
+  <span>Systè§°me</span>
 </h2>
 
-<div class="system-grid" *ngIf="system()">
-  <flow-card title="G&eacute;n&eacute;ral">
-    <div class="stat-row">
-      <span class="stat-label">Uptime</span>
-      <span class="stat-value">{{ (system()!.uptime / 86400) | number:'1.0-0' }}j {{ ((system()!.uptime % 86400) / 3600) | number:'2.0-0' }}h</span>
+<flow-card title="Statut" class="animate-fade-in">
+  <div class="status-grid">
+    <div class="status-item">
+      <i class="bi bi-plug"></i>
+      <span>Alimentation</span>
+      <span class="status-value good">OK</span>
     </div>
-    <div class="stat-row">
-      <span class="stat-label">M&eacute;moire libre</span>
-      <span class="stat-value">{{ (system()!.freeMemory / 1024) | number:'1.0-0' }} KB</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">M&eacute;moire totale</span>
-      <span class="stat-value">{{ (system()!.totalMemory / 1024) | number:'1.0-0' }} KB</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Utilisation</span>
-      <span class="stat-value">{{ ((system()!.totalMemory - system()!.freeMemory) / system()!.totalMemory * 100) | number:'1.0-0' }}%</span>
-    </div>
-  </flow-card>
-
-  <flow-card title="R&eacute;seau">
-    <div class="stat-row">
-      <span class="stat-label">WiFi RSSI</span>
-      <span class="stat-value" [class.good]="system()!.wifiRssi > -60" [class.medium]="system()!.wifiRssi >= -70 && system()!.wifiRssi <= -60" [class.bad]="system()!.wifiRssi < -70">
+    <div class="status-item">
+      <i class="bi bi-wifi"></i>
+      <span>WiFi</span>
+      <span class="status-value" [class.good]="system()!.wifiRssi >= -70" [class.bad]="system()!.wifiRssi < -70">
         {{ system()!.wifiRssi }} dBm
       </span>
     </div>
-    <div class="stat-row">
-      <span class="stat-label">Qualit&eacute; signal</span>
-      <span class="stat-value">
-        <i class="bi" 
-           [class.bi-reception-4]="system()!.wifiRssi > -60"
-           [class.bi-reception-3]="system()!.wifiRssi >= -67 && system()!.wifiRssi <= -60"
-           [class.bi-reception-2]="system()!.wifiRssi >= -70 && system()!.wifiRssi < -67"
-           [class.bi-reception-1]="system()!.wifiRssi < -70"></i>
+    <div class="status-item">
+      <i class="bi bi-broadcast"></i>
+      <span>MQTT</span>
+      <span class="status-value" [class.good]="mqttConnected()" [class.bad]="!mqttConnected()">
+        {{ mqttConnected() ? 'Connecté§°' : 'Dé§°connecté§°' }}
       </span>
     </div>
-    <div class="stat-row">
-      <span class="stat-label">MQTT</span>
-      <span class="stat-value" [class.connected]="mqttConnected()">
-        <i class="bi" [class.bi-wifi]="mqttConnected()" [class.bi-wifi-off]="!mqttConnected()"></i>
-        {{ mqttConnected() ? 'Connect&eacute;' : 'D&eacute;connect&eacute;' }}
-      </span>
-    </div>
-  </flow-card>
+  </div>
+</flow-card>
 
-  <flow-card title="Actions">
-    <div class="actions-grid">
-      <flow-button variant="primary">
-        <i class="bi bi-arrow-clockwise"></i>
-        Red&eacute;marrer
-      </flow-button>
-      <flow-button variant="secondary">
-        <i class="bi bi-download"></i>
-        Sauvegarder config
-      </flow-button>
-      <flow-button variant="secondary">
-        <i class="bi bi-upload"></i>
-        Restaurer config
-      </flow-button>
-      <flow-button variant="secondary">
-        <i class="bi bi-box-arrow-up"></i>
-        Mise &agrave; jour
-      </flow-button>
+<flow-card title="Performance" class="animate-fade-in" style="animation-delay: 0.1s">
+  <div class="perf-grid">
+    <div class="perf-item">
+      <div class="perf-label">Uptime</div>
+      <div class="perf-value">
+        <i class="bi bi-clock"></i>
+        {{ formatUptime(system()!.uptime) }}
+      </div>
     </div>
-  </flow-card>
-</div>
+    <div class="perf-item">
+      <div class="perf-label">Mé§°moire libre</div>
+      <div class="perf-value">
+        <i class="bi bi-memory"></i>
+        {{ formatMemory(system()!.freeMemory) }}
+        <small class="perf-percent">({{ ((system()!.freeMemory / system()!.totalMemory) * 100) | number:'1.0-0' }}%)</small>
+      </div>
+    </div>
+    <div class="perf-item">
+      <div class="perf-label">Qualité§° WiFi</div>
+      <div class="perf-value" [class]="getWifiClass(system()!.wifiRssi)">
+        <i class="bi bi-reception-4"></i>
+        {{ getWifiQuality(system()!.wifiRssi) }}
+      </div>
+    </div>
+  </div>
+</flow-card>
 
-<div class="empty-state" *ngIf="!mqttConnected()">
-  <i class="bi bi-wifi-off"></i>
-  <p>En attente de connexion MQTT...</p>
+<flow-card title="Ré§°seau" class="animate-fade-in" style="animation-delay: 0.2s">
+  <div class="network-grid">
+    <div class="network-item">
+      <i class="bi bi-router"></i>
+      <div>
+        <div class="network-label">Signal WiFi</div>
+        <div class="network-value" [class]="getWifiClass(system()!.wifiRssi)">
+          {{ system()!.wifiRssi }} dBm
+        </div>
+        <div class="network-sub">{{ getWifiQuality(system()!.wifiRssi) }}</div>
+      </div>
+    </div>
+    <div class="network-item">
+      <i class="bi bi-hdd-network"></i>
+      <div>
+        <div class="network-label">Broker MQTT</div>
+        <div class="network-value" [class.good]="mqttConnected()" [class.bad]="!mqttConnected()">
+          {{ mqttConnected() ? 'Connecté§°' : 'Dé§°connecté§°' }}
+        </div>
+        <div class="network-sub">flowio:1883</div>
+      </div>
+    </div>
+  </div>
+</flow-card>
+
+<div class="error-alert" *ngIf="!system()">
+  <i class="bi bi-exclamation-triangle"></i>
+  En attente des donné § °es systè§°me...
 </div>
