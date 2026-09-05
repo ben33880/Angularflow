@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './shared/layout/layout.component';
-import { MqttSetupComponent } from './features/mqtt-setup/mqtt-setup.component';
+import { NotFoundComponent } from './features/not-found/not-found.component';
 
 export const appRoutes: Routes = [
   {
@@ -9,8 +9,8 @@ export const appRoutes: Routes = [
     pathMatch: 'full'
   },
   {
-    path: 'setup',
-    component: MqttSetupComponent
+    path: '404',
+    component: NotFoundComponent
   },
   {
     path: '',
@@ -43,6 +43,10 @@ export const appRoutes: Routes = [
       {
         path: 'inputs',
         loadComponent: () => import('./features/inputs/inputs.component').then(m => m.InputsComponent)
+      },
+      {
+        path: '**',
+        redirectTo: '404'
       }
     ]
   }
