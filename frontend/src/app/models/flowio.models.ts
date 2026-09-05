@@ -7,6 +7,20 @@ export interface PoolStatus {
   phDosingOn: boolean;
 }
 
+export interface PoolTemperatures {
+  basin: number;
+  return: number;
+  equipment: number;
+  outdoor?: number;
+}
+
+export interface PoolChemistry {
+  ph: number;
+  orp: number;
+  redox?: number;
+  tds?: number;
+}
+
 export interface DeviceConfig {
   wifiSsid: string;
   wifiPassword?: string;
@@ -30,4 +44,24 @@ export interface AlarmEntry {
   message: string;
   timestamp: number;
   acknowledged: boolean;
+}
+
+export interface SystemStatus {
+  uptime: number;
+  freeMemory: number;
+  totalMemory: number;
+  wifiRssi: number;
+  mqttConnected: boolean;
+}
+
+export interface RelayState {
+  id: number;
+  name: string;
+  on: boolean;
+}
+
+export interface InputState {
+  id: number;
+  name: string;
+  active: boolean;
 }
