@@ -27,15 +27,6 @@ export class ConfigComponent implements OnInit {
   readonly saved = signal(false);
   readonly mqttConnected = this.mqtt.connected;
 
-  constructor() {
-    // Subscribe to MQTT config
-    this.mqtt.config$.subscribe(config => {
-      if (config) {
-        this.configSignal.set(config);
-      }
-    });
-  }
-
   ngOnInit(): void {
     this.mqtt.connect();
     this.load();
@@ -59,7 +50,7 @@ export class ConfigComponent implements OnInit {
         }
       });
     } else {
-      this.mqtt.requestConfig();
+      // MQTT will push config updates
       this.loading.set(false);
     }
   }
@@ -67,30 +58,23 @@ export class ConfigComponent implements OnInit {
   save(): void {
     const cfg = this.configSignal();
     if (!cfg) return;
+    
     this.loading.set(true);
     this.error.set(null);
     this.saved.set(false);
     
-    if (this.mqttConnected()) {
-      this.mqtt.updateConfig(cfg);
+    // Use MQTT to update config
+    this.mqtt.updateConfig(cfg);
+    
+    // Optimistic update
+    setTimeout(() => {
       this.saved.set(true);
       this.loading.set(false);
-    } else {
-      this.api.updateConfig(cfg).subscribe({
-        next: () => {
-          this.saved.set(true);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Erreur de sauvegarde');
-          this.loading.set(false);
-        }
-      });
-    }
+    }, 500);
   }
 
   reboot(): void {
-    if (confirm('Redé¬°marrer le contrôleur ?')) {
+    if (confirm('Voulez-vous vraiment redé§°marrer le contrôleur ?')) {
       this.mqtt.reboot();
     }
   }

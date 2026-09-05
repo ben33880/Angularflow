@@ -26,11 +26,9 @@ export class AlarmsComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    // Subscribe to MQTT alarms
-    this.mqtt.alarms$.subscribe(alarms => {
-      if (Array.isArray(alarms)) {
-        this.alarmsSignal.set(alarms);
-      }
+    // Subscribe to MQTT alarm topics
+    this.mqtt.alarmsActive$.subscribe(alarms => {
+      this.alarmsSignal.set(alarms);
     });
   }
 
@@ -56,6 +54,7 @@ export class AlarmsComponent implements OnInit {
         }
       });
     } else {
+      // MQTT will push alarms in real-time
       this.loading.set(false);
     }
   }
@@ -65,10 +64,6 @@ export class AlarmsComponent implements OnInit {
   }
 
   acknowledge(id: string): void {
-    this.mqtt.publish(`flowio/cmd/alarms/${id}/ack`, {});
-  }
-
-  acknowledgeAll(): void {
-    this.mqtt.publish('flowio/cmd/alarms/ack_all', {});
+    this.mqtt.acknowledgeAlarm(id);
   }
 }

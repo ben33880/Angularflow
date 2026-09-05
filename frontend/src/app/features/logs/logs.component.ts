@@ -25,13 +25,19 @@ export class LogsComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly mqttConnected = this.mqtt.connected;
 
-  private readonly maxLogs = 100;
-
   constructor() {
-    // Subscribe to MQTT logs streaming
-    this.mqtt.logsInfo$.subscribe(log => this.addLog(log));
-    this.mqtt.logsWarn$.subscribe(log => this.addLog(log));
-    this.mqtt.logsError$.subscribe(log => this.addLog(log));
+    // Subscribe to MQTT log topics
+    this.mqtt.logsInfo$.subscribe(log => {
+      if (log) this.addLog(log);
+    });
+    
+    this.mqtt.logsWarn$.subscribe(log => {
+      if (log) this.addLog(log);
+    });
+    
+    this.mqtt.logsError$.subscribe(log => {
+      if (log) this.addLog(log);
+    });
   }
 
   ngOnInit(): void {
@@ -47,7 +53,7 @@ export class LogsComponent implements OnInit {
     if (!this.mqttConnected()) {
       this.api.getLogs().subscribe({
         next: (l) => {
-          this.logsSignal.set(l.slice(-this.maxLogs));
+          this.logsSignal.set(l);
           this.loading.set(false);
         },
         error: (err) => {
@@ -56,14 +62,14 @@ export class LogsComponent implements OnInit {
         }
       });
     } else {
+      // MQTT will push logs in real-time
       this.loading.set(false);
     }
   }
 
   private addLog(log: LogEntry): void {
     const current = this.logsSignal();
-    const updated = [...current, log].slice(-this.maxLogs);
-    this.logsSignal.set(updated);
+    this.logsSignal.set([log, ...current].slice(0, 100)); // Keep last 100 logs
   }
 
   levelClass(level: string): string {
@@ -72,9 +78,5 @@ export class LogsComponent implements OnInit {
       case 'WARN': return 'level-warn';
       default: return 'level-info';
     }
-  }
-
-  clear(): void {
-    this.logsSignal.set([]);
   }
 }
