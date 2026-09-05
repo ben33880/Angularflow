@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf } from '@angular/common';
-import { FlowioApiService } from '../../services/flowio-api.service';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
@@ -17,7 +16,6 @@ import type { PoolStatus, PoolTemperatures, PoolChemistry, SystemStatus } from '
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
-  private readonly api = inject(FlowioApiService);
   private readonly mqtt = inject(MqttService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -42,7 +40,10 @@ export class DashboardComponent implements OnInit {
   constructor() {
     // Subscribe to ALL MQTT topics
     this.mqtt.poolStatus$.subscribe(status => {
-      if (status) this.statusSignal.set(status);
+      if (status) {
+        this.statusSignal.set(status);
+        this.loading.set(false);
+      }
     });
     
     this.mqtt.temperatures$.subscribe(temps => {
@@ -60,26 +61,8 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.mqtt.connect();
-    this.load();
-    this.destroyRef.onDestroy(() => this.mqtt.disconnect());
-  }
-
-  load(): void {
     this.loading.set(true);
-    this.error.set(null);
-    
-    if (!this.mqttConnected()) {
-      this.api.getPoolStatus().subscribe({
-        next: (s) => {
-          this.statusSignal.set(s);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Erreur de chargement');
-          this.loading.set(false);
-        }
-      });
-    }
+    this.destroyRef.onDestroy(() => this.mqtt.disconnect());
   }
 
   toggleFiltration(): void {

@@ -1,6 +1,5 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
-import { FlowioApiService } from '../../services/flowio-api.service';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
@@ -15,7 +14,6 @@ import type { LogEntry } from '../../models/flowio.models';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LogsComponent implements OnInit {
-  private readonly api = inject(FlowioApiService);
   private readonly mqtt = inject(MqttService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -26,7 +24,7 @@ export class LogsComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    // Subscribe to MQTT log topics
+    // Subscribe to MQTT log topics - REAL TIME
     this.mqtt.logsInfo$.subscribe(log => {
       if (log) this.addLog(log);
     });
@@ -42,29 +40,8 @@ export class LogsComponent implements OnInit {
 
   ngOnInit(): void {
     this.mqtt.connect();
-    this.load();
+    this.loading.set(false); // MQTT push logs in real-time
     this.destroyRef.onDestroy(() => this.mqtt.disconnect());
-  }
-
-  load(): void {
-    this.loading.set(true);
-    this.error.set(null);
-    
-    if (!this.mqttConnected()) {
-      this.api.getLogs().subscribe({
-        next: (l) => {
-          this.logsSignal.set(l);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error.set(err?.message ?? 'Erreur de chargement');
-          this.loading.set(false);
-        }
-      });
-    } else {
-      // MQTT will push logs in real-time
-      this.loading.set(false);
-    }
   }
 
   private addLog(log: LogEntry): void {

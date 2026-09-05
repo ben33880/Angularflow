@@ -21,7 +21,7 @@ export class SystemComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    // Subscribe to MQTT system topics
+    // Subscribe to ALL MQTT system topics - REAL TIME
     this.mqtt.systemStatus$.subscribe(status => {
       this.systemSignal.set(status);
     });
