@@ -1,10 +1,32 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  frontend:
+  flowio-frontend:
     build:
       context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "8080:80"
-    environment:
-      - FLOWIO_DEVICE_IP=${FLOWIO_DEVICE_IP}
+      - "80:80"
+    volumes:
+      # Mount config.json from host to container
+      - ./config.json:/usr/share/nginx/html/config.json:ro
+    restart: unless-stopped
+    networks:
+      - flowio-network
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    restart: unless-stopped
+    networks:
+      - flowio-network
+
+networks:
+  flowio-network:
+    driver: bridge

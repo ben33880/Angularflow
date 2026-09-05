@@ -1,6 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { MqttConfigService } from './mqtt-config.service';
-import type { MqttConfig } from './mqtt-config.service';
+import { FileConfigService } from './file-config.service';
+import type { AppConfig } from './file-config.service';
 import type {
   PoolStatus,
   PoolTemperatures,
@@ -26,7 +26,7 @@ interface MqttMessage {
   providedIn: 'root'
 })
 export class MqttService {
-  private readonly configService = inject(MqttConfigService);
+  private readonly configService = inject(FileConfigService);
   
   private client: MqttClient | null = null;
   private readonly connectedSignal = signal(false);
@@ -83,17 +83,13 @@ export class MqttService {
 
   constructor() {}
 
-  connect(config?: Partial<MqttConfig>): void {
-    if (config) {
-      this.configService.saveConfig(config);
-    }
-
+  connect(): void {
     const brokerUrl = this.configService.getBrokerUrl();
     const cfg = this.configService.config();
 
     console.log('[MQTT] Connecting to', brokerUrl);
 
-    this.client = new MqttClient(brokerUrl, cfg.clientId);
+    this.client = new MqttClient(brokerUrl, `flowio-web-${Math.random().toString(16).slice(3)}`);
     
     this.client.onConnect = () => {
       console.log('[MQTT] Connected!');
