@@ -7,32 +7,17 @@ import { NgIf } from '@angular/common';
   imports: [NgIf],
   template: `
     <div class="stat-card">
-      <div class="stat-icon">
+      <div class="text-4xl mb-3 gradient-text">
         <i class="bi bi-activity"></i>
       </div>
-      <div class="stat-label">{{ label() }}</div>
-      <div class="stat-value">
+      <div class="text-sm text-slate-400 mb-2 font-medium">{{ label() }}</div>
+      <div class="text-4xl font-bold text-white leading-none">
         <ng-content></ng-content>
       </div>
-      <div class="stat-unit" *ngIf="unit()">{{ unit() }}</div>
+      <div class="text-xs text-slate-400 mt-2" *ngIf="unit()">{{ unit() }}</div>
     </div>
   `,
-  styles: [`
-    .stat-icon {
-      @apply text-3xl mb-3;
-      @apply bg-gradient-primary bg-clip-text;
-      -webkit-text-fill-color: transparent;
-    }
-    .stat-label {
-      @apply text-sm text-text-secondary mb-2 font-medium;
-    }
-    .stat-value {
-      @apply text-3xl font-bold text-text-primary leading-none;
-    }
-    .stat-unit {
-      @apply text-xs text-text-secondary mt-2;
-    }
-  `],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StatCardComponent {

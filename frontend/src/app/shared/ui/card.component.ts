@@ -6,26 +6,16 @@ import { NgIf } from '@angular/common';
   standalone: true,
   imports: [NgIf],
   template: `
-    <div class="flow-card">
-      <div class="flow-card-header" *ngIf="title()">
-        <h3 class="flow-card-title">{{ title() }}</h3>
+    <div class="glass-card p-6 mb-6">
+      <div class="mb-5" *ngIf="title()">
+        <h3 class="text-xl font-bold text-white m-0">{{ title() }}</h3>
       </div>
-      <div class="flow-card-content">
+      <div class="text-white">
         <ng-content></ng-content>
       </div>
     </div>
   `,
-  styles: [`
-    .flow-card-header {
-      @apply mb-5;
-    }
-    .flow-card-title {
-      @apply m-0 text-xl font-bold text-text-primary;
-    }
-    .flow-card-content {
-      @apply text-text-primary;
-    }
-  `],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CardComponent {

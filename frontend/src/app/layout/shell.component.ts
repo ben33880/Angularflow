@@ -7,51 +7,16 @@ import { NavComponent } from './nav.component';
   standalone: true,
   imports: [RouterOutlet, NavComponent],
   template: `
-    <div class="app-shell">
+    <div class="flex min-h-screen">
       <app-nav />
-      <main class="app-main">
-        <div class="app-content">
+      <main class="flex-1 bg-dark-bg overflow-x-hidden">
+        <div class="container-fluid py-4 px-6">
           <router-outlet />
         </div>
       </main>
     </div>
   `,
-  styles: [`
-    .app-shell {
-      display: flex;
-      min-height: 100vh;
-    }
-    .app-main {
-      flex: 1;
-      margin-left: 260px;
-      padding: 32px;
-      background: transparent;
-      animation: fadeIn 0.5s ease-out;
-    }
-    .app-content {
-      max-width: 1400px;
-      margin: 0 auto;
-      animation: slideUp 0.6s ease-out;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  `],
+  styles: [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ShellComponent {}

@@ -1,16 +1,16 @@
-<div class="dashboard-header animate-fade-in">
-  <h1 class="page-title">
-    <i class="bi bi-water"></i>
+<div class="flex justify-between items-center mb-8 p-6 glass-card animate-fade-in">
+  <h1 class="flex items-center gap-4 text-4xl font-bold m-0 gradient-text">
+    <i class="bi bi-water text-5xl"></i>
     <span>Dashboard Piscine</span>
   </h1>
-  <div class="header-actions">
-    <button class="btn-refresh" (click)="load()" [class.loading]="loading()">
+  <div class="flex gap-4">
+    <button class="w-12 h-12 rounded-full bg-primary-500/10 border-2 border-primary-500/30 text-primary-500 flex items-center justify-center cursor-pointer transition-all duration-200 text-2xl hover:bg-primary-500/20 hover:border-primary-500 hover:rotate-90" (click)="load()" [class.animate-spin]="loading()">
       <i class="bi bi-arrow-clockwise"></i>
     </button>
   </div>
 </div>
 
-<div class="stats-grid animate-fade-in" style="animation-delay: 0.1s">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6 mb-8 animate-fade-in" style="animation-delay: 0.1s">
   <flow-card *ngIf="status(); else loadingTpl">
     <flow-stat-card label="Tempé¬°rature" unit=" °C">
       {{ temperature() | temperature }}
@@ -29,13 +29,13 @@
 </div>
 
 <flow-card title="É§quipements" class="animate-fade-in" style="animation-delay: 0.2s">
-  <div class="equipments" *ngIf="status(); else loadingTpl2">
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-droplet-fill"></i>
+  <div class="flex flex-col gap-4" *ngIf="status(); else loadingTpl2">
+    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
+      <div class="flex items-center gap-4">
+        <i class="bi bi-droplet-fill text-4xl gradient-text"></i>
         <div>
-          <div class="equipment-name">Filtration</div>
-          <div class="equipment-status" [class.status-on]="status()!.filtrationOn">
+          <div class="font-semibold text-base text-white mb-1">Filtration</div>
+          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.filtrationOn" [class.font-semibold]="status()!.filtrationOn">
             {{ status()!.filtrationOn ? 'En marche' : 'Àªrrêªªté¬°' }}
           </div>
         </div>
@@ -45,12 +45,12 @@
         {{ status()!.filtrationOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
       </flow-button>
     </div>
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-flask"></i>
+    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
+      <div class="flex items-center gap-4">
+        <i class="bi bi-flask text-4xl gradient-text"></i>
         <div>
-          <div class="equipment-name">Dosage chlore</div>
-          <div class="equipment-status" [class.status-on]="status()!.chlorineDosingOn">
+          <div class="font-semibold text-base text-white mb-1">Dosage chlore</div>
+          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.chlorineDosingOn" [class.font-semibold]="status()!.chlorineDosingOn">
             {{ status()!.chlorineDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
           </div>
         </div>
@@ -60,12 +60,12 @@
         {{ status()!.chlorineDosingOn ? 'Arrêªªter' : 'Dé¬°marrer' }}
       </flow-button>
     </div>
-    <div class="equipment-item">
-      <div class="equipment-info">
-        <i class="bi bi-ph-down"></i>
+    <div class="flex justify-between items-center p-5 bg-white/5 rounded-xl border border-white/10 transition-all duration-200 hover:bg-white/8 hover:border-primary-500/30">
+      <div class="flex items-center gap-4">
+        <i class="bi bi-ph-down text-4xl gradient-text"></i>
         <div>
-          <div class="equipment-name">Dosage pH-</div>
-          <div class="equipment-status" [class.status-on]="status()!.phDosingOn">
+          <div class="font-semibold text-base text-white mb-1">Dosage pH-</div>
+          <div class="text-sm text-slate-400" [class.text-emerald-400]="status()!.phDosingOn" [class.font-semibold]="status()!.phDosingOn">
             {{ status()!.phDosingOn ? 'En marche' : 'Àªrrêªªté¬°' }}
           </div>
         </div>
@@ -77,21 +77,21 @@
     </div>
   </div>
   <ng-template #loadingTpl2>
-    <div class="loading-state">
-      <div class="spinner"></div>
+    <div class="flex items-center justify-center gap-4 p-12 text-slate-400">
+      <div class="w-6 h-6 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
       <span>Chargement…</span>
     </div>
   </ng-template>
 </flow-card>
 
-<div class="error-alert" *ngIf="error()">
-  <i class="bi bi-exclamation-triangle"></i>
+<div class="flex items-center gap-3 p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 mt-6" *ngIf="error()">
+  <i class="bi bi-exclamation-triangle text-2xl"></i>
   {{ error() }}
 </div>
 
 <ng-template #loadingTpl>
-  <div class="loading-state">
-    <div class="spinner"></div>
+  <div class="flex items-center justify-center gap-4 p-12 text-slate-400">
+    <div class="w-6 h-6 border-4 border-primary-500/20 border-t-primary-500 rounded-full animate-spin"></div>
     <span>Chargement…</span>
   </div>
 </ng-template>
