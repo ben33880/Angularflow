@@ -38,6 +38,7 @@ Contrô·§·leur intelligent pour piscine avec interface web moderne et archite
 - ✅ **Docker-ready** - `docker-compose.yml` inclus
 - ✅ **Config persistante** - Fichier `config.json` monté·§ en volume
 - ✅ **SPA moderne** - Angular 20+, signals, standalone components
+- ✅ **Proxmox LXC** - Script d'install auto pour containers
 
 ---
 
@@ -47,6 +48,7 @@ Contrô·§·leur intelligent pour piscine avec interface web moderne et archite
 
 - Docker & Docker Compose
 - Ou Node.js 24+ & npm 10+
+- Ou Proxmox VE (pour LXC)
 
 ### Option 1 : Docker (Recommandé·§)
 
@@ -66,7 +68,32 @@ docker-compose up -d
 # http://localhost
 ```
 
-### Option 2 : Dev local
+### Option 2 : Proxmox LXC
+
+```bash
+# 1. Créer un container Debian 12
+pct create 100 local:vztmpl/debian-12-standard_12.2-1_amd64.tar.zst \
+  --rootfs local-lvm:4 \
+  --memory 512 \
+  --cores 1 \
+  --net0 name=eth0,bridge=vmbr0,ip=dhcp \
+  --hostname flowio \
+  --unprivileged 1
+
+# 2. Exé§°cuter le script d'install
+pct exec 100 -- bash -c "$(curl -s https://raw.githubusercontent.com/ben33880/Angularflow/main/proxmox/install-flowio.sh)"
+
+# 3. Configurer et lancer
+pct enter 100
+cd /opt/flowio
+nano config.json
+docker-compose up -d
+
+# 4. Ouvrir
+# http://<IP_LXC>
+```
+
+### Option 3 : Dev local
 
 ```bash
 # 1. Installer
@@ -94,6 +121,9 @@ Angularflow/
 ├── Dockerfile               # Build Angular + Nginx
 ├── nginx.conf               # Config serveur web
 ├── README.md
+├── proxmox/                 # Template LXC Proxmox
+│   ├── README.md
+│   └── install-flowio.sh
 └── frontend/
     ├── src/
     │   ├── app/
@@ -200,6 +230,14 @@ services:
 
 Le fichier est monté·§ en **lecture seule** dans le container.
 
+### Proxmox LXC
+
+Voir [`proxmox/README.md`](proxmox/README.md) pour :
+- Création du container
+- Script d'install auto
+- Configuration recommandé•e
+- Backup & restore
+
 ---
 
 ## 🔒 Sé-•curité·§
@@ -225,6 +263,12 @@ Le fichier est monté·§ en **lecture seule** dans le container.
    - Isoler le broker MQTT du réseau public
    - Utiliser un VLAN dédié pour l'IoT
    - Activer le client isolation sur le WiFi
+
+5. **Proxmox LXC** :
+   - Utiliser des containers **unprivileged**
+   - Limiter les ressources (CPU, RAM)
+   - Activer le firewall Proxmox
+   - Backup ré-•gulier avec `pct backup`
 
 ### Exemple Mosquitto (auth)
 
@@ -370,6 +414,23 @@ ls -l config.json
 docker-compose restart flowio-frontend
 ```
 
+### Proxmox LXC
+
+```bash
+# Container ne démarre pas
+pct status 100
+pct start 100
+
+# Docker ne fonctionne pas
+pct exec 100 -- systemctl status docker
+pct exec 100 -- systemctl restart docker
+
+# Ports non accessibles
+pct exec 100 -- ufw status
+pct exec 100 -- ufw allow 80
+pct exec 100 -- ufw allow 1883
+```
+
 ---
 
 ## 📝 License
@@ -392,3 +453,13 @@ MIT - Voir [LICENSE](LICENSE)
 
 - Issues GitHub : https://github.com/ben33880/Angularflow/issues
 - Discussions : https://github.com/ben33880/Angularflow/discussions
+
+---
+
+## 🖥 Dé-•ploiement
+
+| Plateforme | Guide | Status |
+|------------|-------|--------|
+| Docker | Voir [Quick Start](#option-1--docker-recommandé§°) | ✅ |
+| Proxmox LXC | Voir [`proxmox/README.md`](proxmox/README.md) | ✅ |
+| Dev local | Voir [Quick Start](#option-3--dev-local) | ✅ |
