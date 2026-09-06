@@ -29,6 +29,6 @@
     "@angular/compiler-cli": "^22.0.0",
     "@types/mqtt": "^2.5.0",
     "tailwindcss": "^4.1.12",
-    "typescript": "~5.8.0"
+    "typescript": "~6.0.0"
   }
 }
