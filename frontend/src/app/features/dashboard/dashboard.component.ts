@@ -4,17 +4,14 @@ import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
-import { SkeletonComponent } from '../../shared/ui/skeleton.component';
-import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
-import { BadgeComponent } from '../../shared/ui/badge.component';
 import { ToastService } from '../../shared/ui/toast.service';
 import { TemperaturePipe } from '../../shared/pipes/temperature.pipe';
-import type { PoolStatus, PoolTemperatures, PoolChemistry, SystemStatus } from '../../models/flowio.models';
+import type { PoolStatus, PoolChemistry } from '../../models/flowio.models';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgClass, CardComponent, StatCardComponent, ButtonComponent, SkeletonComponent, EmptyStateComponent, BadgeComponent, TemperaturePipe],
+  imports: [NgIf, NgClass, CardComponent, StatCardComponent, ButtonComponent, TemperaturePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,14 +22,10 @@ export class DashboardComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
 
   private readonly statusSignal = signal<PoolStatus | null>(null);
-  private readonly temperaturesSignal = signal<PoolTemperatures | null>(null);
   private readonly chemistrySignal = signal<PoolChemistry | null>(null);
-  private readonly systemSignal = signal<SystemStatus | null>(null);
   
   readonly status = computed(() => this.statusSignal());
-  readonly temperatures = computed(() => this.temperaturesSignal());
   readonly chemistry = computed(() => this.chemistrySignal());
-  readonly system = computed(() => this.systemSignal());
   
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -50,19 +43,11 @@ export class DashboardComponent implements OnInit {
       }
     });
     
-    this.mqtt.temperatures$.subscribe(temps => {
-      if (temps) this.temperaturesSignal.set(temps);
-    });
-    
     this.mqtt.chemistry$.subscribe(chem => {
       if (chem) {
         this.chemistrySignal.set(chem);
         this.checkAlerts();
       }
-    });
-    
-    this.mqtt.systemStatus$.subscribe(sys => {
-      if (sys) this.systemSignal.set(sys);
     });
   }
 
