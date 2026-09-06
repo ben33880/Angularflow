@@ -53,6 +53,15 @@ export class MockMqttService {
   private readonly alarmsActiveSignal = signal<AlarmEntry[]>([]);
   readonly alarmsActive$ = this.alarmsActiveSignal.asReadonly();
 
+  private readonly configSignal = signal<DeviceConfig | null>(null);
+  readonly config$ = this.configSignal.asReadonly();
+
+  private readonly relaysSignal = signal<RelayState[]>([]);
+  private readonly inputsSignal = signal<InputState[]>([]);
+  
+  readonly relays$ = this.relaysSignal.asReadonly();
+  readonly inputs$ = this.inputsSignal.asReadonly();
+
   private intervals: number[] = [];
 
   connect(): void {
@@ -70,9 +79,9 @@ export class MockMqttService {
     // Pool status - update every 2s
     this.intervals.push(setInterval(() => {
       this.poolStatusSignal.set({
-        temperature: 27.5 + Math.random() * 0.5,
-        ph: 7.2 + Math.random() * 0.3 - 0.15,
-        orp: 680 + Math.random() * 40 - 20,
+        temperature: 27 + Math.random() * 2,
+        ph: 7.2 + Math.random() * 0.4,
+        orp: 680 + Math.random() * 40,
         filtrationOn: true,
         chlorineDosingOn: false,
         phDosingOn: false
@@ -82,20 +91,18 @@ export class MockMqttService {
     // Temperatures - update every 3s
     this.intervals.push(setInterval(() => {
       this.temperaturesSignal.set({
-        basin: 27.5 + Math.random() * 0.5,
-        return: 28.0 + Math.random() * 0.5,
-        equipment: 32.0 + Math.random() * 1,
-        outdoor: 25.0 + Math.random() * 3
+        basin: 27.5 + Math.random(),
+        return: 26 + Math.random(),
+        equipment: 25 + Math.random(),
+        outdoor: 22 + Math.random() * 5
       });
     }, 3000));
 
     // Chemistry - update every 2s
     this.intervals.push(setInterval(() => {
       this.chemistrySignal.set({
-        ph: 7.2 + Math.random() * 0.3 - 0.15,
-        orp: 680 + Math.random() * 40 - 20,
-        redox: 680 + Math.random() * 40,
-        tds: 500 + Math.random() * 50
+        ph: 7.3 + Math.random() * 0.3,
+        orp: 690 + Math.random() * 30
       });
     }, 2000));
 
@@ -103,9 +110,9 @@ export class MockMqttService {
     this.intervals.push(setInterval(() => {
       this.systemStatusSignal.set({
         uptime: Math.floor(Date.now() / 1000),
-        freeMemory: 150000 + Math.floor(Math.random() * 10000),
+        freeMemory: 150000 + Math.floor(Math.random() * 50000),
         totalMemory: 200000,
-        wifiRssi: -45 + Math.floor(Math.random() * 10),
+        wifiRssi: -45 - Math.floor(Math.random() * 20),
         mqttConnected: true
       });
     }, 5000));
@@ -120,7 +127,7 @@ export class MockMqttService {
     // Memory - update every 10s
     this.intervals.push(setInterval(() => {
       this.systemMemorySignal.set({
-        free: 150000 + Math.floor(Math.random() * 10000),
+        free: 150000 + Math.floor(Math.random() * 50000),
         total: 200000
       });
     }, 10000));
@@ -128,7 +135,7 @@ export class MockMqttService {
     // WiFi - update every 10s
     this.intervals.push(setInterval(() => {
       this.systemWifiSignal.set({
-        rssi: -45 + Math.floor(Math.random() * 10),
+        rssi: -45 - Math.floor(Math.random() * 20),
         ssid: 'PoolWiFi'
       });
     }, 10000));
@@ -141,76 +148,109 @@ export class MockMqttService {
       });
     }, 10000));
 
-    // Logs - occasional
+    // Logs - random every 5-15s
     this.intervals.push(setInterval(() => {
-      const messages = [
-        'Filtration cycle started',
-        'Temperature stable',
-        'pH within range',
-        'ORP sensor reading normal',
-        'System health check passed'
-      ];
-      this.logsInfoSignal.set({
+      const level = Math.random() > 0.8 ? 'warn' : Math.random() > 0.9 ? 'error' : 'info';
+      const messages = {
+        info: ['System check completed', 'Pool status updated', 'Sensors reading normal'],
+        warn: ['Temperature fluctuation detected', 'pH slightly high'],
+        error: ['Sensor timeout', 'Connection retry']
+      };
+      const msg = messages[level][Math.floor(Math.random() * messages[level].length)];
+      
+      const log: LogEntry = {
         timestamp: Date.now(),
-        level: 'INFO',
-        message: messages[Math.floor(Math.random() * messages.length)],
-        module: 'PoolController'
-      });
-    }, 8000));
+        level: level as any,
+        message: msg,
+        module: 'system'
+      };
 
-    // Alarms - occasional
+      if (level === 'info') this.logsInfoSignal.set(log);
+      else if (level === 'warn') this.logsWarnSignal.set(log);
+      else this.logsErrorSignal.set(log);
+    }, 5000 + Math.random() * 10000));
+
+    // Alarms - random every 20-60s
     this.intervals.push(setInterval(() => {
       if (Math.random() > 0.7) {
-        this.alarmsActiveSignal.set([
-          {
-            id: 'alarm-1',
-            severity: 'LOW',
-            code: 'TEMP_HIGH',
-            message: 'Temperature slightly above target',
-            timestamp: Date.now(),
-            acknowledged: false
-          }
-        ]);
+        const severities = ['LOW', 'MEDIUM', 'HIGH'] as const;
+        const codes = ['TEMP_HIGH', 'PH_LOW', 'ORP_LOW', 'FLOW_ERROR'];
+        
+        const alarm: AlarmEntry = {
+          id: Math.random().toString(36).slice(2),
+          severity: severities[Math.floor(Math.random() * severities.length)],
+          code: codes[Math.floor(Math.random() * codes.length)],
+          message: 'Alarm triggered',
+          timestamp: Date.now(),
+          acknowledged: false
+        };
+
+        this.alarmsActiveSignal.set([alarm]);
       }
-    }, 15000));
+    }, 20000 + Math.random() * 40000));
+
+    // Config - once
+    this.configSignal.set({
+      wifiSsid: 'PoolWiFi',
+      wifiPassword: 'pool1234',
+      mqttEnabled: true,
+      mqttBroker: 'localhost',
+      mqttUsername: '',
+      mqttPassword: ''
+    });
+
+    // Relays - once
+    this.relaysSignal.set([
+      { id: 1, name: 'Filtration', on: true },
+      { id: 2, name: 'Chlorine', on: false },
+      { id: 3, name: 'pH', on: false },
+      { id: 4, name: 'Heater', on: false },
+      { id: 5, name: 'Light', on: false },
+      { id: 6, name: 'Pump 1', on: false },
+      { id: 7, name: 'Pump 2', on: false },
+      { id: 8, name: 'Aux', on: false }
+    ]);
+
+    // Inputs - once
+    this.inputsSignal.set([
+      { id: 1, name: 'Flow Sensor', active: true },
+      { id: 2, name: 'Pressure', active: true },
+      { id: 3, name: 'Level', active: true },
+      { id: 4, name: 'Temp Probe', active: true }
+    ]);
   }
 
-  // Mock commands
+  // Commands (mock)
   setFiltration(on: boolean): void {
-    const status = this.poolStatusSignal();
-    if (status) {
-      this.poolStatusSignal.set({ ...status, filtrationOn: on });
-    }
+    this.poolStatusSignal.update(s => s ? { ...s, filtrationOn: on } : null);
   }
 
   setChlorine(on: boolean): void {
-    const status = this.poolStatusSignal();
-    if (status) {
-      this.poolStatusSignal.set({ ...status, chlorineDosingOn: on });
-    }
+    this.poolStatusSignal.update(s => s ? { ...s, chlorineDosingOn: on } : null);
   }
 
   setPhDosing(on: boolean): void {
-    const status = this.poolStatusSignal();
-    if (status) {
-      this.poolStatusSignal.set({ ...status, phDosingOn: on });
-    }
+    this.poolStatusSignal.update(s => s ? { ...s, phDosingOn: on } : null);
   }
 
   setRelay(id: number, on: boolean): void {
-    // Mock relay toggle
+    this.relaysSignal.update(relays => 
+      relays.map(r => r.id === id ? { ...r, on } : r)
+    );
   }
 
   updateConfig(config: DeviceConfig): void {
-    // Mock config update
+    this.configSignal.set(config);
   }
 
   reboot(): void {
     // Mock reboot
-    setTimeout(() => this.connect(), 2000);
+    setTimeout(() => this.connect(), 3000);
   }
 
   acknowledgeAlarm(id: string): void {
-    this.alarmsActiveSignal.set([]);
+    this.alarmsActiveSignal.update(alarms => 
+      alarms.map(a => a.id === id ? { ...a, acknowledged: true } : a)
+    );
   }
 }
