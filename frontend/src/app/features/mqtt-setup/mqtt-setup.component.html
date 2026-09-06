@@ -10,7 +10,7 @@
         type="text"
         [(ngModel)]="broker"
         placeholder="192.168.1.100"
-        required
+        [required]="true"
       />
       <small>Adresse IP ou hostname du broker (ex: 192.168.1.100)</small>
     </div>
@@ -23,7 +23,7 @@
           type="number"
           [(ngModel)]="port"
           placeholder="1883"
-          required
+          [required]="true"
         />
       </div>
 
@@ -34,7 +34,7 @@
           type="text"
           [(ngModel)]="path"
           placeholder="/mqtt"
-          required
+          [required]="true"
         />
       </div>
     </div>

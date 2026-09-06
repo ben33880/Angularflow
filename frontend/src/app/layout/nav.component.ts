@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MqttService } from '../../services/mqtt.service';
+import { MqttService } from '../services/mqtt.service';
 
 @Component({
   selector: 'app-nav',

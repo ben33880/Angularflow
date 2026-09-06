@@ -1,6 +1,6 @@
 import { computed, inject, signal, Signal, WritableSignal } from '@angular/core';
-import { FlowioApiService } from '../../services/flowio-api.service';
-import type { LogEntry } from '../../models/flowio.models';
+import { FlowioApiService } from '../services/flowio-api.service';
+import type { LogEntry } from '../models/flowio.models';
 
 export class LogsStore {
   private readonly api = inject(FlowioApiService);

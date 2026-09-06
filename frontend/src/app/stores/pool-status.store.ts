@@ -1,6 +1,6 @@
 import { computed, inject, signal, Signal, WritableSignal } from '@angular/core';
-import { FlowioApiService } from '../../services/flowio-api.service';
-import type { PoolStatus } from '../../models/flowio.models';
+import { FlowioApiService } from '../services/flowio-api.service';
+import type { PoolStatus } from '../models/flowio.models';
 
 export class PoolStatusStore {
   private readonly api = inject(FlowioApiService);

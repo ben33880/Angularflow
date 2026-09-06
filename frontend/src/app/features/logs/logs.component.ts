@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -11,7 +11,7 @@ import type { LogEntry } from '../../models/flowio.models';
 @Component({
   selector: 'app-logs',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, CardComponent, ButtonComponent, EmptyStateComponent, BadgeComponent, SkeletonComponent],
+  imports: [NgIf, NgFor, DatePipe, CardComponent, ButtonComponent],
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,15 +27,18 @@ export class LogsComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    this.mqtt.logsInfo$.subscribe(log => {
+    effect(() => {
+      const log = this.mqtt.logsInfo$();
       if (log) this.addLog(log);
     });
     
-    this.mqtt.logsWarn$.subscribe(log => {
+    effect(() => {
+      const log = this.mqtt.logsWarn$();
       if (log) this.addLog(log);
     });
     
-    this.mqtt.logsError$.subscribe(log => {
+    effect(() => {
+      const log = this.mqtt.logsError$();
       if (log) this.addLog(log);
     });
   }
@@ -49,6 +52,12 @@ export class LogsComponent implements OnInit {
   private addLog(log: LogEntry): void {
     const current = this.logsSignal();
     this.logsSignal.set([log, ...current].slice(0, 100));
+  }
+
+  load(): void {
+    this.loading.set(true);
+    this.mqtt.connect();
+    this.loading.set(false);
   }
 
   levelClass(level: string): string {

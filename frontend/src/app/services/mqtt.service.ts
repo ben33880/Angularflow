@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { MqttClient, IClientOptions } from 'mqtt';
+import mqtt from 'mqtt';
+import type { MqttClient, IClientOptions } from 'mqtt';
 import { FileConfigService } from './file-config.service';
 import { LoggerService } from './logger.service';
 import type {
@@ -101,16 +102,17 @@ export class MqttService {
       options.password = cfg.mqtt.password;
     }
 
-    this.client = new MqttClient(brokerUrl, options);
+    const client = mqtt.connect(brokerUrl, options);
+    this.client = client;
     
-    this.client.on('connect', () => {
+    client.on('connect', () => {
       this.logger.info('Connected', 'MQTT');
       this.connectedSignal.set(true);
       this.reconnectAttempts = 0;
       this.subscribe();
     });
 
-    this.client.on('close', () => {
+    client.on('close', () => {
       this.logger.warn('Disconnected', 'MQTT');
       this.connectedSignal.set(false);
       this.client = null;
@@ -124,13 +126,13 @@ export class MqttService {
       }
     });
 
-    this.client.on('error', (error) => {
+    client.on('error', (error: Error) => {
       this.logger.error(`Error: ${error.message}`, 'MQTT');
       this.connectedSignal.set(false);
       this.client = null;
     });
 
-    this.client.on('message', (topic: string, message: Buffer) => {
+    client.on('message', (topic: string, message: Buffer) => {
       this.handleMessage(topic, message.toString());
     });
   }

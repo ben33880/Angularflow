@@ -1,24 +1,24 @@
 import { Component, inject, signal, computed, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { NgIf, NgFor, NgClass } from '@angular/common';
+import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { NgIf, NgClass } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
-import { MqttConfigService } from '../../services/mqtt-config.service';
+import { FileConfigService } from '../../services/file-config.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NgFor, NgClass],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIf, NgClass],
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LayoutComponent implements OnInit {
   private readonly mqtt = inject(MqttService);
-  private readonly configService = inject(MqttConfigService);
+  private readonly configService = inject(FileConfigService);
   private readonly router = inject(Router);
 
   readonly mqttConnected = this.mqtt.connected;
-  readonly mqttConfig = this.configService.config;
+  readonly mqttConfig = computed(() => this.configService.config().mqtt);
   readonly isConfigured = this.configService.isConfigured;
 
   readonly navItems = [

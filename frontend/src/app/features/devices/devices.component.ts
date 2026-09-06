@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -25,11 +25,13 @@ export class DevicesComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    this.mqtt.relays$.subscribe(relays => {
+    effect(() => {
+      const relays = this.mqtt.relays$();
       if (relays) this.relaysSignal.set(relays);
     });
     
-    this.mqtt.inputs$.subscribe(inputs => {
+    effect(() => {
+      const inputs = this.mqtt.inputs$();
       if (inputs) this.inputsSignal.set(inputs);
     });
   }

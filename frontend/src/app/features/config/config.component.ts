@@ -1,5 +1,4 @@
 import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
-import { NgIf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FileConfigService } from '../../services/file-config.service';
 import { MqttService } from '../../services/mqtt.service';
@@ -12,7 +11,7 @@ import type { DeviceConfig } from '../../models/flowio.models';
 @Component({
   selector: 'app-config',
   standalone: true,
-  imports: [NgIf, FormsModule, CardComponent, ButtonComponent, InputComponent],
+  imports: [FormsModule, CardComponent, ButtonComponent, InputComponent],
   templateUrl: './config.component.html',
   styleUrls: ['./config.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

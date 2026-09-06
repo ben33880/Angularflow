@@ -2,7 +2,7 @@ import { Component, input, ChangeDetectionStrategy } from '@angular/core';
 import { NgIf } from '@angular/common';
 
 @Component({
-  selector: 'flow-card',
+  selector: 'app-card, flow-card',
   standalone: true,
   imports: [NgIf],
   template: `

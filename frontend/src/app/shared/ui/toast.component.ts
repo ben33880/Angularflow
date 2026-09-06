@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
-import { NgFor, NgClass, NgIf } from '@angular/common';
+import { NgClass } from '@angular/common';
 import { ToastService, Toast } from './toast.service';
 
 @Component({
   selector: 'app-toasts',
   standalone: true,
-  imports: [NgFor, NgClass, NgIf],
+  imports: [NgClass],
   template: `
     <div class="fixed top-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
       @for (toast of toasts(); track toast.id) {

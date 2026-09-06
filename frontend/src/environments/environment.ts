@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  mockMqtt: true
+  mockMqtt: true,
+  flowioBaseUrl: ''
 };

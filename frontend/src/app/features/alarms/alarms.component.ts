@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -11,7 +11,7 @@ import type { AlarmEntry } from '../../models/flowio.models';
 @Component({
   selector: 'app-alarms',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, CardComponent, ButtonComponent, EmptyStateComponent, BadgeComponent, SkeletonComponent],
+  imports: [NgIf, NgFor, DatePipe, CardComponent, ButtonComponent],
   templateUrl: './alarms.component.html',
   styleUrls: ['./alarms.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,7 +27,8 @@ export class AlarmsComponent implements OnInit {
   readonly mqttConnected = this.mqtt.connected;
 
   constructor() {
-    this.mqtt.alarmsActive$.subscribe(alarms => {
+    effect(() => {
+      const alarms = this.mqtt.alarmsActive$();
       this.alarmsSignal.set(alarms);
       this.loading.set(false);
     });
@@ -51,4 +52,11 @@ export class AlarmsComponent implements OnInit {
   acknowledge(id: string): void {
     this.mqtt.acknowledgeAlarm(id);
   }
+
+  load(): void {
+    this.loading.set(true);
+    this.mqtt.connect();
+  }
+
+  readonly unackCount = computed(() => this.alarmsSignal().filter(alarm => !alarm.acknowledged).length);
 }

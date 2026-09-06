@@ -16,10 +16,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": false,
     "useDefineForClassFields": false,
+    "rootDir": "./src",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
     "downlevelIteration": true,
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true
   },
   "angularCompilerOptions": {

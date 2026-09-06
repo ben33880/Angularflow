@@ -1,5 +1,5 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { DecimalPipe, NgIf } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { BadgeComponent } from '../../shared/ui/badge.component';
@@ -9,7 +9,7 @@ import type { SystemStatus } from '../../models/flowio.models';
 @Component({
   selector: 'app-system',
   standalone: true,
-  imports: [NgIf, CardComponent, BadgeComponent, SkeletonComponent],
+  imports: [NgIf, DecimalPipe, CardComponent],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -24,30 +24,35 @@ export class SystemComponent implements OnInit {
   readonly loading = signal(true);
 
   constructor() {
-    this.mqtt.systemStatus$.subscribe(status => {
+    effect(() => {
+      const status = this.mqtt.systemStatus$();
       this.systemSignal.set(status);
       this.loading.set(false);
     });
     
-    this.mqtt.systemUptime$.subscribe(uptime => {
+    effect(() => {
+      const uptime = this.mqtt.systemUptime$();
       if (uptime && this.systemSignal()) {
         this.systemSignal.update(s => s ? { ...s, uptime: uptime.uptime } : null);
       }
     });
     
-    this.mqtt.systemMemory$.subscribe(memory => {
+    effect(() => {
+      const memory = this.mqtt.systemMemory$();
       if (memory && this.systemSignal()) {
         this.systemSignal.update(s => s ? { ...s, freeMemory: memory.free, totalMemory: memory.total } : null);
       }
     });
     
-    this.mqtt.systemWifi$.subscribe(wifi => {
+    effect(() => {
+      const wifi = this.mqtt.systemWifi$();
       if (wifi && this.systemSignal()) {
         this.systemSignal.update(s => s ? { ...s, wifiRssi: wifi.rssi } : null);
       }
     });
     
-    this.mqtt.systemMqtt$.subscribe(mqtt => {
+    effect(() => {
+      const mqtt = this.mqtt.systemMqtt$();
       if (mqtt && this.systemSignal()) {
         this.systemSignal.update(s => s ? { ...s, mqttConnected: mqtt.connected } : null);
       }

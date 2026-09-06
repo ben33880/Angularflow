@@ -56,7 +56,7 @@ export class MockMqttService {
   readonly relays$ = this.relaysSignal.asReadonly();
   readonly inputs$ = this.inputsSignal.asReadonly();
 
-  private intervals: number[] = [];
+  private intervals: ReturnType<typeof setInterval>[] = [];
 
   connect(): void {
     if (this.connectedSignal()) return;
