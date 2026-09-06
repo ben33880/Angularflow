@@ -1,132 +1,131 @@
-<div class="config-container">
-  <app-card>
-    <h1>Configuration</h1>
-    
-    <section class="config-section">
-      <h2>📡 Configuration MQTT</h2>
-      <p class="section-desc">Ces paramètres sont stocké·§ dans <code>config.json</code> (volume Docker)</p>
+<div class="max-w-4xl mx-auto animate-fade-in">
+  <app-header
+    title="Configuration"
+    description="Paramè§°tres MQTT et device"
+  />
 
-      <div class="form-group">
-        <label for="broker">Broker MQTT</label>
+  <div class="space-y-8">
+    <!-- MQTT Config -->
+    <app-card>
+      <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">📡 Configuration MQTT</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
+        Ces paramè§°tres sont stocké·§s dans <code class="px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded text-xs">config.json</code>
+      </p>
+
+      <div class="space-y-4">
         <app-input
           id="broker"
-          type="text"
-          [(ngModel)]="broker"
+          label="Broker MQTT"
           placeholder="192.168.1.100"
-          required
+          [(value)]="broker"
+          hint="Adresse IP ou hostname du broker"
         />
-        <small>Adresse IP ou hostname du broker</small>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="port">Port</label>
+        <div class="grid grid-cols-2 gap-4">
           <app-input
             id="port"
+            label="Port"
             type="number"
-            [(ngModel)]="port"
             placeholder="1883"
-            required
+            [(value)]="port"
           />
-        </div>
 
-        <div class="form-group">
-          <label for="path">Path WebSocket</label>
           <app-input
             id="path"
-            type="text"
-            [(ngModel)]="path"
+            label="Path WebSocket"
             placeholder="/mqtt"
-            required
+            [(value)]="path"
           />
         </div>
-      </div>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label for="username">Username (optionnel)</label>
+        <div class="grid grid-cols-2 gap-4">
           <app-input
             id="username"
-            type="text"
-            [(ngModel)]="username"
+            label="Username (optionnel)"
             placeholder="mqtt_user"
+            [(value)]="username"
           />
-        </div>
 
-        <div class="form-group">
-          <label for="password">Password (optionnel)</label>
           <app-input
             id="password"
+            label="Password (optionnel)"
             type="password"
-            [(ngModel)]="password"
             placeholder="••••••••"
-          />
-        </div>
-      </div>
-
-      <div class="actions">
-        <app-button
-          variant="primary"
-          (click)="saveMqttConfig()"
-          [disabled]="loading() || !broker()"
-        >
-          {{ loading() ? 'Sauvegarde...' : 'Sauvegarder MQTT' }}
-        </app-button>
-
-        <span *ngIf="saved()" class="success-text">✓ Sauvegardé·§ ! Reconnexion...</span>
-      </div>
-
-      <div *ngIf="error()" class="error-message">
-        {{ error() }}
-      </div>
-    </section>
-
-    <section class="config-section">
-      <h2>🔧 Configuration Device</h2>
-      <p class="section-desc">Paramè§°tres du contrôleur Flow.io (stocké·§ dans l'ESP32)</p>
-
-      <div *ngIf="config()" class="device-config">
-        <div class="form-group">
-          <label for="wifiSsid">WiFi SSID</label>
-          <app-input
-            id="wifiSsid"
-            type="text"
-            [(ngModel)]="config()!.wifiSsid"
-            placeholder="MyWiFi"
+            [(value)]="password"
           />
         </div>
 
-        <div class="form-group">
-          <label for="wifiPassword">WiFi Password</label>
-          <app-input
-            id="wifiPassword"
-            type="password"
-            [(ngModel)]="config()!.wifiPassword"
-            placeholder="••••••••"
-          />
-        </div>
-
-        <div class="actions">
+        <div class="flex items-center gap-3 pt-4">
           <app-button
             variant="primary"
-            (click)="saveDeviceConfig()"
-            [disabled]="loading()"
+            (click)="saveMqttConfig()"
+            [disabled]="loading() || !broker()"
           >
-            {{ loading() ? 'Sauvegarde...' : 'Sauvegarder Device' }}
+            {{ loading() ? 'Sauvegarde...' : 'Sauvegarder MQTT' }}
           </app-button>
 
-          <app-button
-            variant="danger"
-            (click)="reboot()"
-          >
-            🔄 Redé§°marrer
-          </app-button>
+          @if (saved()) {
+            <span class="text-sm text-green-600 dark:text-green-400 font-medium">
+              ✓ Sauvegardé·§ ! Reconnexion...
+            </span>
+          }
         </div>
-      </div>
 
-      <div *ngIf="!config()" class="no-config">
-        <p>En attente des données du contrôleur...</p>
+        @if (error()) {
+          <div class="p-3 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg text-red-700 dark:text-red-400 text-sm">
+            {{ error() }}
+          </div>
+        }
       </div>
-    </section>
-  </app-card>
+    </app-card>
+
+    <!-- Device Config -->
+    <app-card>
+      <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">🔧 Configuration Device</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-400 mb-6">
+        Paramè§°tres du contrôleur Flow.io (stocké·§s dans l'ESP32)
+      </p>
+
+      @if (config()) {
+        <div class="space-y-4">
+          <app-input
+            id="wifiSsid"
+            label="WiFi SSID"
+            placeholder="MyWiFi"
+            [(value)]="config()!.wifiSsid"
+          />
+
+          <app-input
+            id="wifiPassword"
+            label="WiFi Password"
+            type="password"
+            placeholder="••••••••"
+            [(value)]="config()!.wifiPassword"
+          />
+
+          <div class="flex items-center gap-3 pt-4">
+            <app-button
+              variant="primary"
+              (click)="saveDeviceConfig()"
+              [disabled]="loading()"
+            >
+              {{ loading() ? 'Sauvegarde...' : 'Sauvegarder Device' }}
+            </app-button>
+
+            <app-button
+              variant="danger"
+              (click)="reboot()"
+            >
+              🔄 Redé§°marrer
+            </app-button>
+          </div>
+        </div>
+      } @else {
+        <div class="py-8 text-center text-slate-600 dark:text-slate-400">
+          <div class="text-4xl mb-3">⏳</div>
+          <p>En attente des données du contrôleur...</p>
+        </div>
+      }
+    </app-card>
+  </div>
 </div>
