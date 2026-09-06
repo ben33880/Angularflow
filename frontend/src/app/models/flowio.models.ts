@@ -11,39 +11,12 @@ export interface PoolTemperatures {
   basin: number;
   return: number;
   equipment: number;
-  outdoor?: number;
+  outdoor: number;
 }
 
 export interface PoolChemistry {
   ph: number;
   orp: number;
-  redox?: number;
-  tds?: number;
-}
-
-export interface DeviceConfig {
-  wifiSsid: string;
-  wifiPassword?: string;
-  mqttEnabled: boolean;
-  mqttBroker: string;
-  mqttUsername?: string;
-  mqttPassword?: string;
-}
-
-export interface LogEntry {
-  timestamp: number;
-  level: 'INFO' | 'WARN' | 'ERROR';
-  message: string;
-  module?: string;
-}
-
-export interface AlarmEntry {
-  id: string;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  code: string;
-  message: string;
-  timestamp: number;
-  acknowledged: boolean;
 }
 
 export interface SystemStatus {
@@ -52,6 +25,50 @@ export interface SystemStatus {
   totalMemory: number;
   wifiRssi: number;
   mqttConnected: boolean;
+}
+
+export interface SystemUptime {
+  uptime: number;
+}
+
+export interface SystemMemory {
+  free: number;
+  total: number;
+}
+
+export interface SystemWifi {
+  rssi: number;
+  ssid: string;
+}
+
+export interface SystemMqtt {
+  connected: boolean;
+  broker: string;
+}
+
+export interface LogEntry {
+  timestamp: number;
+  level: 'info' | 'warn' | 'error';
+  message: string;
+  module: string;
+}
+
+export interface AlarmEntry {
+  id: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  code: string;
+  message: string;
+  timestamp: number;
+  acknowledged: boolean;
+}
+
+export interface DeviceConfig {
+  wifiSsid: string;
+  wifiPassword: string;
+  mqttEnabled: boolean;
+  mqttBroker: string;
+  mqttUsername: string;
+  mqttPassword: string;
 }
 
 export interface RelayState {
