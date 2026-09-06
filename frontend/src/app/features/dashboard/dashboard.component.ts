@@ -37,6 +37,14 @@ export class DashboardComponent implements OnInit {
   readonly temperature = computed(() => this.statusSignal()?.temperature ?? null);
   readonly ph = computed(() => this.chemistrySignal()?.ph ?? this.statusSignal()?.ph ?? null);
   readonly orp = computed(() => this.chemistrySignal()?.orp ?? this.statusSignal()?.orp ?? null);
+  readonly phDisplay = computed(() => {
+    const value = this.ph();
+    return value === null ? '--' : value.toFixed(2);
+  });
+  readonly orpDisplay = computed(() => {
+    const value = this.orp();
+    return value === null ? '--' : `${Math.round(value)} mV`;
+  });
 
   constructor() {
     effect(() => {

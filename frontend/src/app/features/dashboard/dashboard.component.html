@@ -50,7 +50,7 @@
       <!-- pH -->
       <app-stat-card
         label="pH"
-        [value]="(ph() ?? '--').toString()"
+        [value]="phDisplay()"
         icon="🧪"
       >
         <div class="mt-4 flex items-center gap-2">
@@ -63,7 +63,7 @@
       <!-- ORP -->
       <app-stat-card
         label="ORP"
-        [value]="(orp() ?? '--').toString() + ' mV'"
+        [value]="orpDisplay()"
         icon="⚡"
       >
         <div class="mt-4 flex items-center gap-2">
