@@ -27,7 +27,6 @@ export class MqttService {
   private readonly connectedSignal = signal(false);
   readonly connected = computed(() => this.connectedSignal());
 
-  // Status streams
   private readonly poolStatusSignal = signal<PoolStatus | null>(null);
   private readonly temperaturesSignal = signal<PoolTemperatures | null>(null);
   private readonly chemistrySignal = signal<PoolChemistry | null>(null);
@@ -38,7 +37,6 @@ export class MqttService {
   readonly chemistry$ = this.chemistrySignal.asReadonly();
   readonly systemStatus$ = this.systemStatusSignal.asReadonly();
 
-  // System detail streams
   private readonly systemUptimeSignal = signal<SystemUptime | null>(null);
   private readonly systemMemorySignal = signal<SystemMemory | null>(null);
   private readonly systemWifiSignal = signal<SystemWifi | null>(null);
@@ -49,7 +47,6 @@ export class MqttService {
   readonly systemWifi$ = this.systemWifiSignal.asReadonly();
   readonly systemMqtt$ = this.systemMqttSignal.asReadonly();
 
-  // Logs streams
   private readonly logsInfoSignal = signal<LogEntry | null>(null);
   private readonly logsWarnSignal = signal<LogEntry | null>(null);
   private readonly logsErrorSignal = signal<LogEntry | null>(null);
@@ -58,18 +55,15 @@ export class MqttService {
   readonly logsWarn$ = this.logsWarnSignal.asReadonly();
   readonly logsError$ = this.logsErrorSignal.asReadonly();
 
-  // Alarms streams
   private readonly alarmsActiveSignal = signal<AlarmEntry[]>([]);
   private readonly alarmsHistorySignal = signal<AlarmEntry[]>([]);
   
   readonly alarmsActive$ = this.alarmsActiveSignal.asReadonly();
   readonly alarmsHistory$ = this.alarmsHistorySignal.asReadonly();
 
-  // Config stream
   private readonly configSignal = signal<DeviceConfig | null>(null);
   readonly config$ = this.configSignal.asReadonly();
 
-  // Relays & Inputs streams
   private readonly relaysSignal = signal<RelayState[]>([]);
   private readonly inputsSignal = signal<InputState[]>([]);
   
@@ -81,8 +75,6 @@ export class MqttService {
   connect(): void {
     const cfg = this.configService.config();
     const brokerUrl = `ws://${cfg.mqtt.broker}:${cfg.mqtt.port}${cfg.mqtt.path}`;
-    
-    console.log('[MQTT] Connecting to', brokerUrl);
 
     const options: IClientOptions = {
       clientId: `flowio-web-${Math.random().toString(16).slice(3)}`,
@@ -99,24 +91,20 @@ export class MqttService {
     this.client = new MqttClient(brokerUrl, options);
     
     this.client.on('connect', () => {
-      console.log('[MQTT] Connected!');
       this.connectedSignal.set(true);
       this.subscribe();
     });
 
     this.client.on('close', () => {
-      console.log('[MQTT] Disconnected');
       this.connectedSignal.set(false);
     });
 
-    this.client.on('error', (error: Error) => {
-      console.error('[MQTT] Error:', error);
+    this.client.on('error', () => {
       this.connectedSignal.set(false);
     });
 
     this.client.on('message', (topic: string, message: Buffer) => {
-      const payload = message.toString();
-      this.handleMessage(topic, payload);
+      this.handleMessage(topic, message.toString());
     });
   }
 
@@ -149,10 +137,7 @@ export class MqttService {
       'flowio/inputs/state'
     ];
 
-    this.client.subscribe(topics, { qos: 0 }, (err) => {
-      if (err) console.error('[MQTT] Subscribe error:', err);
-      else console.log('[MQTT] Subscribed to', topics.length, 'topics');
-    });
+    this.client.subscribe(topics, { qos: 0 });
   }
 
   private handleMessage(topic: string, payload: string): void {
@@ -209,12 +194,11 @@ export class MqttService {
           this.inputsSignal.set(data);
           break;
       }
-    } catch (e) {
-      console.error('[MQTT] Failed to parse message:', topic, e);
+    } catch {
+      // Ignore parse errors silently
     }
   }
 
-  // Commands
   setFiltration(on: boolean): void {
     this.publish('flowio/cmd/pool/filtration', { on });
   }
@@ -244,12 +228,7 @@ export class MqttService {
   }
 
   private publish(topic: string, payload: any): void {
-    if (!this.client || !this.connectedSignal()) {
-      console.warn('[MQTT] Cannot publish - not connected');
-      return;
-    }
-    this.client.publish(topic, JSON.stringify(payload), { qos: 0 }, (err) => {
-      if (err) console.error('[MQTT] Publish error:', err);
-    });
+    if (!this.client || !this.connectedSignal()) return;
+    this.client.publish(topic, JSON.stringify(payload), { qos: 0 });
   }
 }
