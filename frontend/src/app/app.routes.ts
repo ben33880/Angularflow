@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { LayoutComponent } from './shared/layout/layout.component';
 import { NotFoundComponent } from './features/not-found/not-found.component';
 
-export const appRoutes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     redirectTo: 'dashboard',

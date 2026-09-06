@@ -1,7 +1,7 @@
 
 {
   "name": "Angularflow",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:24-bookworm",
   "remoteUser": "node",
   "forwardPorts": [4200],
   "portsAttributes": {
