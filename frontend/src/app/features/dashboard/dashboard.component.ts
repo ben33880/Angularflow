@@ -22,13 +22,13 @@ import type { PoolStatus, PoolChemistry } from '../../models/flowio.models';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardComponent implements OnInit {
-  private readonly mqttService = inject(MqttService);
-  private readonly mockService = inject(MockMqttService);
+  private readonly mqtt = inject(MqttService);
+  private readonly mock = inject(MockMqttService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
-  private readonly service = environment.useMockMqtt ? this.mockService : this.mqttService;
-
+  private readonly service = environment.mockMqtt ? this.mock : this.mqtt;
+  
   private readonly statusSignal = signal<PoolStatus | null>(null);
   private readonly chemistrySignal = signal<PoolChemistry | null>(null);
   
