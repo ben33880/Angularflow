@@ -1,3 +1,4 @@
+@if (system(); as currentSystem) {
 <h2 class="page-title">
   <i class="bi bi-cpu"></i>
   <span>Système</span>
@@ -13,8 +14,8 @@
     <div class="status-item">
       <i class="bi bi-wifi"></i>
       <span>WiFi</span>
-      <span class="status-value" [class.good]="system()!.wifiRssi >= -70" [class.bad]="system()!.wifiRssi < -70">
-        {{ system()!.wifiRssi }} dBm
+      <span class="status-value" [class.good]="currentSystem.wifiRssi >= -70" [class.bad]="currentSystem.wifiRssi < -70">
+      {{ currentSystem.wifiRssi }} dBm
       </span>
     </div>
     <div class="status-item">
@@ -33,22 +34,22 @@
       <div class="perf-label">Uptime</div>
       <div class="perf-value">
         <i class="bi bi-clock"></i>
-        {{ formatUptime(system()!.uptime) }}
+        {{ formatUptime(currentSystem.uptime) }}
       </div>
     </div>
     <div class="perf-item">
       <div class="perf-label">Mémoire libre</div>
       <div class="perf-value">
         <i class="bi bi-memory"></i>
-        {{ formatMemory(system()!.freeMemory) }}
-        <small class="perf-percent">({{ ((system()!.freeMemory / system()!.totalMemory) * 100) | number:'1.0-0' }}%)</small>
+        {{ formatMemory(currentSystem.freeMemory) }}
+        <small class="perf-percent">({{ ((currentSystem.freeMemory / currentSystem.totalMemory) * 100) | number:'1.0-0' }}%)</small>
       </div>
     </div>
     <div class="perf-item">
       <div class="perf-label">Qualité WiFi</div>
-      <div class="perf-value" [class]="getWifiClass(system()!.wifiRssi)">
+      <div class="perf-value" [class]="getWifiClass(currentSystem.wifiRssi)">
         <i class="bi bi-reception-4"></i>
-        {{ getWifiQuality(system()!.wifiRssi) }}
+        {{ getWifiQuality(currentSystem.wifiRssi) }}
       </div>
     </div>
   </div>
@@ -60,8 +61,8 @@
       <i class="bi bi-router"></i>
       <div>
         <div class="network-label">Signal WiFi</div>
-        <div class="network-value" [class]="getWifiClass(system()!.wifiRssi)">
-          {{ system()!.wifiRssi }} dBm
+        <div class="network-value" [class]="getWifiClass(currentSystem.wifiRssi)">
+          {{ currentSystem.wifiRssi }} dBm
         </div>
         <div class="network-sub">{{ getWifiQuality(system()!.wifiRssi) }}</div>
       </div>
@@ -78,8 +79,9 @@
     </div>
   </div>
 </flow-card>
+} @else {
+  <div class="error-alert">
+    En attente des données système...
+  </div>
+}
 
-<div class="error-alert" *ngIf="!system()">
-  <i class="bi bi-exclamation-triangle"></i>
-  En attente des données système...
-</div>

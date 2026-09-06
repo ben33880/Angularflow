@@ -38,6 +38,6 @@ export class LayoutComponent implements OnInit {
   }
 
   openSettings(): void {
-    this.router.navigate(['/setup']);
+    this.router.navigate(['/config']);
   }
 }

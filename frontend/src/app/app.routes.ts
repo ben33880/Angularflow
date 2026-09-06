@@ -37,6 +37,14 @@ export const routes: Routes = [
         loadComponent: () => import('./features/config/config.component').then(m => m.ConfigComponent)
       },
       {
+        path: 'relays',
+        loadComponent: () => import('./features/devices/devices.component').then(m => m.DevicesComponent)
+      },
+      {
+        path: 'inputs',
+        loadComponent: () => import('./features/devices/devices.component').then(m => m.DevicesComponent)
+      },
+      {
         path: '**',
         redirectTo: '404'
       }

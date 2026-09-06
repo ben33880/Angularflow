@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
-import { DecimalPipe, NgIf } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { BadgeComponent } from '../../shared/ui/badge.component';
@@ -9,7 +9,7 @@ import type { SystemStatus } from '../../models/flowio.models';
 @Component({
   selector: 'app-system',
   standalone: true,
-  imports: [NgIf, DecimalPipe, CardComponent],
+  imports: [DecimalPipe, CardComponent],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
