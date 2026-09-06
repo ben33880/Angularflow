@@ -5,7 +5,6 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { routes } from './app.routes';
 import { mqttServiceProvider } from './services/mqtt.provider';
-import { toastServiceProvider } from './shared/ui/toast.provider';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,7 +12,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(),
     provideAnimations(),
-    mqttServiceProvider,
-    toastServiceProvider
+    mqttServiceProvider
   ]
 };
