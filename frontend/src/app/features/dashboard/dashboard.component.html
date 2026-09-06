@@ -1,8 +1,26 @@
 <div class="max-w-7xl mx-auto animate-fade-in">
   <!-- Header -->
   <div class="mb-8 animate-slide-up">
-    <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">Dashboard</h1>
-    <p class="text-slate-600 dark:text-slate-400">Vue d'ensemble de votre piscine</p>
+      <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-slate-900 dark:text-white mb-2">{{ i18n.t('dashboard.title') }}</h1>
+          <p class="text-slate-600 dark:text-slate-400">{{ i18n.t('dashboard.subtitle') }}</p>
+        </div>
+        <div class="language-picker" role="group" [attr.aria-label]="i18n.t('dashboard.language')">
+          @for (language of i18n.availableLanguages; track language.code) {
+            <button
+              type="button"
+              class="language-option"
+              [class.active]="i18n.language() === language.code"
+              [attr.aria-pressed]="i18n.language() === language.code"
+              [attr.title]="language.label"
+              (click)="i18n.setLanguage(language.code)">
+              <span aria-hidden="true">{{ language.flag }}</span>
+              <span>{{ language.code.toUpperCase() }}</span>
+            </button>
+          }
+        </div>
+      </div>
   </div>
 
   <!-- Loading State with Skeletons -->
@@ -36,13 +54,13 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
       <!-- Temperature -->
       <app-stat-card
-        label="Température"
+        [label]="i18n.t('dashboard.temperature')"
         [value]="(temperature() | temperature) ?? '--'"
         icon="🌡️"
       >
         <div class="mt-4">
           <app-badge [variant]="(temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? 'success' : 'warning'">
-            {{ (temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? '✓ Idéale' : '⚠ Ajuster' }}
+            {{ (temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? '✓ ' + i18n.t('dashboard.ideal') : '⚠ ' + i18n.t('dashboard.adjust') }}
           </app-badge>
         </div>
       </app-stat-card>
@@ -55,7 +73,7 @@
       >
         <div class="mt-4 flex items-center gap-2">
           <app-badge [variant]="(ph() ?? 0) >= 7.0 && (ph() ?? 0) <= 7.6 ? 'success' : (ph() ?? 0) >= 6.8 && (ph() ?? 0) <= 7.8 ? 'warning' : 'error'">
-            {{ (ph() ?? 0) >= 7.0 && (ph() ?? 0) <= 7.6 ? '✓ Bon' : (ph() ?? 0) >= 6.8 && (ph() ?? 0) <= 7.8 ? '⚠ Ajuster' : '✕ Critique' }}
+            {{ (ph() ?? 0) >= 7.0 && (ph() ?? 0) <= 7.6 ? '✓ ' + i18n.t('dashboard.good') : (ph() ?? 0) >= 6.8 && (ph() ?? 0) <= 7.8 ? '⚠ ' + i18n.t('dashboard.adjust') : '✕ ' + i18n.t('dashboard.critical') }}
           </app-badge>
         </div>
       </app-stat-card>
@@ -68,21 +86,21 @@
       >
         <div class="mt-4 flex items-center gap-2">
           <app-badge [variant]="(orp() ?? 0) >= 650 ? 'success' : (orp() ?? 0) >= 600 ? 'warning' : 'error'">
-            {{ (orp() ?? 0) >= 650 ? '✓ Bon' : (orp() ?? 0) >= 600 ? '⚠ Bas' : '✕ Critique' }}
+            {{ (orp() ?? 0) >= 650 ? '✓ ' + i18n.t('dashboard.good') : (orp() ?? 0) >= 600 ? '⚠ ' + i18n.t('dashboard.low') : '✕ ' + i18n.t('dashboard.critical') }}
           </app-badge>
         </div>
       </app-stat-card>
 
       <!-- System Status -->
       <app-stat-card
-        label="Système"
+        [label]="i18n.t('dashboard.system')"
         [value]="mqttConnected() ? 'En ligne' : 'Hors ligne'"
         icon="⚙️"
       >
         <div class="mt-4">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full" [ngClass]="mqttConnected() ? 'bg-green-500 animate-pulse' : 'bg-red-500'"></span>
-            <span class="text-sm text-slate-600 dark:text-slate-400">{{ mqttConnected() ? 'MQTT connecté' : 'Déconnecté' }}</span>
+            <span class="text-sm text-slate-600 dark:text-slate-400">{{ mqttConnected() ? i18n.t('common.mqttConnected') : i18n.t('common.disconnected') }}</span>
           </div>
         </div>
       </app-stat-card>
@@ -94,22 +112,22 @@
       <app-card>
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Filtration</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Pompe de filtration</p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">{{ i18n.t('dashboard.filtration') }}</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ i18n.t('dashboard.filtrationDescription') }}</p>
           </div>
           <span class="text-3xl">💧</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.filtrationOn ? 'Activée' : 'Désactivée' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Contrôle manuel</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.filtrationOn ? i18n.t('common.enabled') : i18n.t('common.disabled') }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">{{ i18n.t('dashboard.manualControl') }}</span>
           </div>
           <app-button
             [variant]="status()?.filtrationOn ? 'danger' : 'primary'"
             (click)="toggleFiltration()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.filtrationOn ? 'Arrêter' : 'Démarrer' }}
+            {{ status()?.filtrationOn ? i18n.t('common.stop') : i18n.t('common.start') }}
           </app-button>
         </div>
       </app-card>
@@ -118,22 +136,22 @@
       <app-card>
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Chlore</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Doseur de chlore</p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">{{ i18n.t('dashboard.chlorine') }}</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ i18n.t('dashboard.chlorineDescription') }}</p>
           </div>
           <span class="text-3xl">🧂</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? 'Activé' : 'Désactivé' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau : {{ orpDisplay() }}</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? i18n.t('common.enabled') : i18n.t('common.disabled') }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">{{ i18n.t('dashboard.level') }} : {{ orpDisplay() }}</span>
           </div>
           <app-button
             [variant]="status()?.chlorineDosingOn ? 'danger' : 'primary'"
             (click)="toggleChlorine()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.chlorineDosingOn ? 'Arrêter' : 'Démarrer' }}
+            {{ status()?.chlorineDosingOn ? i18n.t('common.stop') : i18n.t('common.start') }}
           </app-button>
         </div>
       </app-card>
@@ -142,22 +160,22 @@
       <app-card>
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">pH</h3>
-            <p class="text-sm text-slate-600 dark:text-slate-400">Correcteur de pH</p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white">{{ i18n.t('dashboard.ph') }}</h3>
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ i18n.t('dashboard.phDescription') }}</p>
           </div>
           <span class="text-3xl">🔬</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? 'Activé' : 'Désactivé' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau : {{ phDisplay() }}</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? i18n.t('common.enabled') : i18n.t('common.disabled') }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">{{ i18n.t('dashboard.level') }} : {{ phDisplay() }}</span>
           </div>
           <app-button
             [variant]="status()?.phDosingOn ? 'danger' : 'primary'"
             (click)="togglePh()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.phDosingOn ? 'Arrêter' : 'Démarrer' }}
+            {{ status()?.phDosingOn ? i18n.t('common.stop') : i18n.t('common.start') }}
           </app-button>
         </div>
       </app-card>

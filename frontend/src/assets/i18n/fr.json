@@ -1,0 +1,42 @@
+{
+    "nav": {
+        "dashboard": "Dashboard",
+        "system": "Système",
+        "relays": "Relais",
+        "inputs": "Entrées",
+        "logs": "Journaux",
+        "alarms": "Alarmes",
+        "config": "Configuration"
+    },
+    "common": {
+        "connected": "Connecté",
+        "disconnected": "Déconnecté",
+        "mqttConnected": "MQTT connecté",
+        "online": "En ligne",
+        "offline": "Hors ligne",
+        "enabled": "Activé",
+        "disabled": "Désactivé",
+        "start": "Démarrer",
+        "stop": "Arrêter"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "Vue d'ensemble de votre piscine",
+        "temperature": "Température",
+        "ideal": "Idéale",
+        "adjust": "Ajuster",
+        "good": "Bon",
+        "low": "Bas",
+        "critical": "Critique",
+        "system": "Système",
+        "filtration": "Filtration",
+        "filtrationDescription": "Pompe de filtration",
+        "manualControl": "Contrôle manuel",
+        "level": "Niveau",
+        "chlorine": "Chlore",
+        "chlorineDescription": "Doseur de chlore",
+        "ph": "pH",
+        "phDescription": "Correcteur de pH",
+        "language": "Langue"
+    }
+}

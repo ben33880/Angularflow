@@ -1,0 +1,42 @@
+{
+    "nav": {
+        "dashboard": "Dashboard",
+        "system": "System",
+        "relays": "Relays",
+        "inputs": "Inputs",
+        "logs": "Logs",
+        "alarms": "Alarms",
+        "config": "Configuration"
+    },
+    "common": {
+        "connected": "Connected",
+        "disconnected": "Disconnected",
+        "mqttConnected": "MQTT connected",
+        "online": "Online",
+        "offline": "Offline",
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "start": "Start",
+        "stop": "Stop"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "subtitle": "Overview of your pool",
+        "temperature": "Temperature",
+        "ideal": "Ideal",
+        "adjust": "Adjust",
+        "good": "Good",
+        "low": "Low",
+        "critical": "Critical",
+        "system": "System",
+        "filtration": "Filtration",
+        "filtrationDescription": "Filtration pump",
+        "manualControl": "Manual control",
+        "level": "Level",
+        "chlorine": "Chlorine",
+        "chlorineDescription": "Chlorine dosing",
+        "ph": "pH",
+        "phDescription": "pH controller",
+        "language": "Language"
+    }
+}

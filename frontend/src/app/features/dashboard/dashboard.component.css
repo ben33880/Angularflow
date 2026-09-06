@@ -1,1 +1,29 @@
-/* Dashboard styles moved to template with Tailwind */
+.language-picker {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.25rem;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.8rem;
+	background: rgba(255, 255, 255, 0.8);
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.language-option {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	border: 0;
+	border-radius: 0.6rem;
+	padding: 0.45rem 0.6rem;
+	color: #64748b;
+	background: transparent;
+	cursor: pointer;
+	font-size: 0.7rem;
+	font-weight: 800;
+	letter-spacing: 0.04em;
+	transition: 160ms ease;
+}
+
+.language-option:hover { background: #f1f5f9; color: #0f172a; }
+.language-option.active { color: #1d4ed8; background: #dbeafe; box-shadow: inset 0 0 0 1px #bfdbfe; }

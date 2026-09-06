@@ -9,6 +9,7 @@ import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
 import { BadgeComponent } from '../../shared/ui/badge.component';
 import { ToastService } from '../../shared/ui/toast.service';
 import { TemperaturePipe } from '../../shared/pipes/temperature.pipe';
+import { I18nService } from '../../services/i18n.service';
 import type { PoolStatus, PoolChemistry } from '../../models/flowio.models';
 
 @Component({
@@ -23,6 +24,7 @@ export class DashboardComponent implements OnInit {
   private readonly mqtt = inject(MqttService);
   private readonly toast = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
+  readonly i18n = inject(I18nService);
   
   private readonly statusSignal = signal<PoolStatus | null>(null);
   private readonly chemistrySignal = signal<PoolChemistry | null>(null);
