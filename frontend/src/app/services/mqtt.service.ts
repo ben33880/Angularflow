@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { MqttClient, IClientOptions } from 'mqtt';
 import { FileConfigService } from './file-config.service';
-import { LoggerService } from '../shared/services/logger.service';
+import { LoggerService } from './logger.service';
 import type {
   PoolStatus,
   PoolTemperatures,
