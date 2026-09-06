@@ -1,6 +1,6 @@
 <h2 class="page-title">
   <i class="bi bi-cpu"></i>
-  <span>Systè§°me</span>
+  <span>Système</span>
 </h2>
 
 <flow-card title="Statut" class="animate-fade-in">
@@ -21,7 +21,7 @@
       <i class="bi bi-broadcast"></i>
       <span>MQTT</span>
       <span class="status-value" [class.good]="mqttConnected()" [class.bad]="!mqttConnected()">
-        {{ mqttConnected() ? 'Connecté§°' : 'Dé§°connecté§°' }}
+        {{ mqttConnected() ? 'Connecté' : 'Déconnecté' }}
       </span>
     </div>
   </div>
@@ -37,7 +37,7 @@
       </div>
     </div>
     <div class="perf-item">
-      <div class="perf-label">Mé§°moire libre</div>
+      <div class="perf-label">Mémoire libre</div>
       <div class="perf-value">
         <i class="bi bi-memory"></i>
         {{ formatMemory(system()!.freeMemory) }}
@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="perf-item">
-      <div class="perf-label">Qualité§° WiFi</div>
+      <div class="perf-label">Qualité WiFi</div>
       <div class="perf-value" [class]="getWifiClass(system()!.wifiRssi)">
         <i class="bi bi-reception-4"></i>
         {{ getWifiQuality(system()!.wifiRssi) }}
@@ -54,7 +54,7 @@
   </div>
 </flow-card>
 
-<flow-card title="Ré§°seau" class="animate-fade-in" style="animation-delay: 0.2s">
+<flow-card title="Réseau" class="animate-fade-in" style="animation-delay: 0.2s">
   <div class="network-grid">
     <div class="network-item">
       <i class="bi bi-router"></i>
@@ -71,7 +71,7 @@
       <div>
         <div class="network-label">Broker MQTT</div>
         <div class="network-value" [class.good]="mqttConnected()" [class.bad]="!mqttConnected()">
-          {{ mqttConnected() ? 'Connecté§°' : 'Dé§°connecté§°' }}
+          {{ mqttConnected() ? 'Connecté' : 'Déconnecté' }}
         </div>
         <div class="network-sub">flowio:1883</div>
       </div>
@@ -81,5 +81,5 @@
 
 <div class="error-alert" *ngIf="!system()">
   <i class="bi bi-exclamation-triangle"></i>
-  En attente des donné § °es systè§°me...
+  En attente des données système...
 </div>

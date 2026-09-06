@@ -1,0 +1,13 @@
+{
+    "mqtt": {
+        "broker": "192.168.1.100",
+        "port": 1883,
+        "path": "/mqtt",
+        "username": "",
+        "password": ""
+    },
+    "device": {
+        "name": "Flow.io Pool Controller",
+        "location": "Pool House"
+    }
+}

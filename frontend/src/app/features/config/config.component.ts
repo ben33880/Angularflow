@@ -69,7 +69,7 @@ export class ConfigComponent implements OnInit {
       });
       
       this.saved.set(true);
-      this.toast.success('Configuration MQTT sauvegardé§°e ! Reconnexion...');
+      this.toast.success('Configuration MQTT sauvegardée ! Reconnexion...');
       
       this.mqtt.disconnect();
       setTimeout(() => this.mqtt.connect(), 500);
@@ -90,7 +90,7 @@ export class ConfigComponent implements OnInit {
     this.saved.set(false);
     
     this.mqtt.updateConfig(cfg);
-    this.toast.success('Configuration device envoyÃ©e !');
+    this.toast.success('Configuration appareil envoyée !');
     
     setTimeout(() => {
       this.saved.set(true);
@@ -99,9 +99,9 @@ export class ConfigComponent implements OnInit {
   }
 
   reboot(): void {
-    if (confirm('Voulez-vous vraiment redé§°marrer le contrôleur ?')) {
+    if (confirm('Voulez-vous vraiment redémarrer le contrôleur ?')) {
       this.mqtt.reboot();
-      this.toast.info('Redé§°marrage en cours...');
+      this.toast.info('Redémarrage en cours...');
     }
   }
 }

@@ -9,7 +9,7 @@
       <span class="alarms-count">{{ alarms().length }} alarmes</span>
       <span class="alarms-unack" *ngIf="unackCount() > 0">
         <span class="pulse-dot"></span>
-        {{ unackCount() }} non acquitté¬®e(s)
+        {{ unackCount() }} non acquittée(s)
       </span>
     </div>
     <flow-button variant="primary" (clicked)="load()">
@@ -30,7 +30,7 @@
           <span class="alarm-code">{{ alarm.code }}</span>
         </div>
         <div class="alarm-status" *ngIf="alarm.acknowledged">
-          <span class="ack-badge">✅ Acquitté¬®e</span>
+          <span class="ack-badge">✅ Acquittée</span>
         </div>
       </div>
       <div class="alarm-message">{{ alarm.message }}</div>

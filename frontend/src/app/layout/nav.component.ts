@@ -21,7 +21,7 @@ import { MqttService } from '../services/mqtt.service';
         <a routerLink="/system" routerLinkActive="active" 
            class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">
           <i class="bi bi-cpu text-2xl"></i>
-          <span>Systè§°me</span>
+          <span>Système</span>
         </a>
         <a routerLink="/config" routerLinkActive="active" 
            class="flex items-center gap-3 px-4 py-3.5 text-text-secondary no-underline rounded-xl transition-all duration-200 font-medium hover:bg-blue-500/10 hover:text-text-primary active:bg-gradient-primary active:text-white active:shadow-[0_4px_15px_rgba(59,130,246,0.4)]">

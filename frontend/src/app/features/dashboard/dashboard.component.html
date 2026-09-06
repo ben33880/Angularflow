@@ -36,13 +36,13 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 animate-slide-up">
       <!-- Temperature -->
       <app-stat-card
-        label="Tempé§°rature"
+        label="Température"
         [value]="(temperature() | temperature) ?? '--'"
         icon="🌡️"
       >
         <div class="mt-4">
           <app-badge [variant]="(temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? 'success' : 'warning'">
-            {{ (temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? '✓ Idé§°ale' : '⚠ Ajuster' }}
+            {{ (temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? '✓ Idéale' : '⚠ Ajuster' }}
           </app-badge>
         </div>
       </app-stat-card>
@@ -75,14 +75,14 @@
 
       <!-- System Status -->
       <app-stat-card
-        label="Systè§°me"
+        label="Système"
         [value]="mqttConnected() ? 'En ligne' : 'Hors ligne'"
         icon="⚙️"
       >
         <div class="mt-4">
           <div class="flex items-center gap-2">
             <span class="w-2 h-2 rounded-full" [ngClass]="mqttConnected() ? 'bg-green-500 animate-pulse' : 'bg-red-500'"></span>
-            <span class="text-sm text-slate-600 dark:text-slate-400">{{ mqttConnected() ? 'MQTT connecté' : 'Dé§°connecté·§' }}</span>
+            <span class="text-sm text-slate-600 dark:text-slate-400">{{ mqttConnected() ? 'MQTT connecté' : 'Déconnecté' }}</span>
           </div>
         </div>
       </app-stat-card>
@@ -101,15 +101,15 @@
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.filtrationOn ? 'Activé§°e' : 'Dé§°sactivé§°e' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Contrô§··le manuel</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.filtrationOn ? 'Activée' : 'Désactivée' }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Contrôle manuel</span>
           </div>
           <app-button
             [variant]="status()?.filtrationOn ? 'danger' : 'primary'"
             (click)="toggleFiltration()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.filtrationOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+            {{ status()?.filtrationOn ? 'Arrêter' : 'Démarrer' }}
           </app-button>
         </div>
       </app-card>
@@ -125,7 +125,7 @@
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? 'Activé' : 'Désactivé' }}</span>
             <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.orp ?? '--' }} mV</span>
           </div>
           <app-button
@@ -133,7 +133,7 @@
             (click)="toggleChlorine()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.chlorineDosingOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+            {{ status()?.chlorineDosingOn ? 'Arrêter' : 'Démarrer' }}
           </app-button>
         </div>
       </app-card>
@@ -149,7 +149,7 @@
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
-            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? 'Activé' : 'Désactivé' }}</span>
             <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.ph ?? '--' }}</span>
           </div>
           <app-button
@@ -157,7 +157,7 @@
             (click)="togglePh()"
             [disabled]="!mqttConnected()"
           >
-            {{ status()?.phDosingOn ? 'Arrê§°ter' : 'Dé§°marrer' }}
+            {{ status()?.phDosingOn ? 'Arrêter' : 'Démarrer' }}
           </app-button>
         </div>
       </app-card>

@@ -1,0 +1,9 @@
+{
+    "name": "Flow.io Pool Controller",
+    "short_name": "Flow.io",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#3b82f6",
+    "icons": []
+}

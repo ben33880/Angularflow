@@ -47,7 +47,7 @@ export class FileConfigService {
 
   async loadConfig(): Promise<void> {
     try {
-      const response = await fetch('/config.json');
+      const response = await fetch('/assets/config.json');
       if (response.ok) {
         const loaded = await response.json();
         this.configSignal.set({ ...DEFAULT_CONFIG, ...loaded });

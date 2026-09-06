@@ -85,7 +85,7 @@ export class SystemComponent implements OnInit {
     if (rssi >= -60) return 'Bon';
     if (rssi >= -70) return 'Moyen';
     if (rssi >= -80) return 'Faible';
-    return 'Trè§°s faible';
+    return 'Très faible';
   }
 
   getWifiClass(rssi: number): string {
