@@ -1,32 +1,23 @@
 version: '3.8'
 
 services:
-  flowio-frontend:
+  angularflow:
     build:
-      context: ./frontend
+      context: .
       dockerfile: Dockerfile
+    container_name: angularflow
     ports:
-      - "80:80"
-    volumes:
-      # Mount config.json from host to container
-      - ./config.json:/usr/share/nginx/html/config.json:ro
+      - "4200:80"
     restart: unless-stopped
     networks:
-      - flowio-network
-
-  mosquitto:
-    image: eclipse-mosquitto:2
-    ports:
-      - "1883:1883"
-      - "9001:9001"
-    volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
-    restart: unless-stopped
-    networks:
-      - flowio-network
+      - angularflow-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 networks:
-  flowio-network:
+  angularflow-network:
     driver: bridge
