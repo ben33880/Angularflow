@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { environment } from '../../environments/environment';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
@@ -27,7 +28,7 @@ export class LoggerService {
   };
 
   constructor() {
-    this.enabled = !this.isProduction();
+    this.enabled = !environment.production;
   }
 
   debug(message: string, context?: string): void {
@@ -60,7 +61,7 @@ export class LoggerService {
 
     this.logsSignal.update(logs => [entry, ...logs].slice(0, 100));
 
-    if (!this.isProduction()) {
+    if (!environment.production) {
       const prefix = context ? `[${context}]` : '[App]';
       const color = this.getColor(level);
       console.log(`${prefix} ${color}${level.toUpperCase()}${this.reset()}: ${message}`);
@@ -79,10 +80,6 @@ export class LoggerService {
 
   private reset(): string {
     return '\x1b[0m';
-  }
-
-  private isProduction(): boolean {
-    return typeof window !== 'undefined' && window.location.hostname !== 'localhost';
   }
 
   clear(): void {
