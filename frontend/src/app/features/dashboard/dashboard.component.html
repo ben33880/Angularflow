@@ -126,7 +126,7 @@
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
             <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? 'Activé' : 'Désactivé' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.orp ?? '--' }} mV</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau : {{ orpDisplay() }}</span>
           </div>
           <app-button
             [variant]="status()?.chlorineDosingOn ? 'danger' : 'primary'"
@@ -150,7 +150,7 @@
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
           <div>
             <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? 'Activé' : 'Désactivé' }}</span>
-            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.ph ?? '--' }}</span>
+            <span class="text-xs text-slate-500 dark:text-slate-400">Niveau : {{ phDisplay() }}</span>
           </div>
           <app-button
             [variant]="status()?.phDosingOn ? 'danger' : 'primary'"

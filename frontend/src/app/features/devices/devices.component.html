@@ -1,51 +1,66 @@
-<h2 class="page-title">
-  <i class="bi bi-cpu"></i>
-  <span>&Eacute;quipements</span>
-</h2>
-
-<flow-card title="Relais" *ngIf="relays().length > 0">
-  <div class="devices-grid">
-    <div class="device-card" *ngFor="let relay of relays()">
-      <div class="device-header">
-        <i class="bi bi-plug" [class.active]="relay.on"></i>
-        <div class="device-info">
-          <div class="device-name">{{ relay.name }}</div>
-          <div class="device-id">Relais #{{ relay.id }}</div>
-        </div>
-      </div>
-      <div class="device-status" [class.status-on]="relay.on">
-        <i class="bi" [class.bi-lightning-charge-fill]="relay.on" [class.bi-lightning-charge]="!relay.on"></i>
-        <span>{{ relay.on ? 'Activ&eacute;' : 'D&eacute;sactiv&eacute;' }}</span>
-      </div>
-      <flow-button 
-        [variant]="relay.on ? 'secondary' : 'primary'" 
-        (clicked)="toggleRelay(relay.id, relay.on)">
-        <i class="bi" [class.bi-toggle-on]="relay.on" [class.bi-toggle-off]="!relay.on"></i>
-        {{ relay.on ? 'D&eacute;sactiver' : 'Activer' }}
-      </flow-button>
-    </div>
+<header class="devices-header">
+  <div>
+    <p class="eyebrow">Supervision matériel</p>
+    <h1 class="page-title">{{ view() === 'relays' ? 'Relais' : 'Entrées' }}</h1>
+    <p class="page-subtitle">{{ view() === 'relays' ? 'Pilotez les sorties connectées à votre installation.' : 'Surveillez les capteurs et contacts numériques.' }}</p>
   </div>
-</flow-card>
-
-<flow-card title="Entr&eacute;es num&eacute;riques" *ngIf="inputs().length > 0">
-  <div class="devices-grid">
-    <div class="device-card" *ngFor="let input of inputs()">
-      <div class="device-header">
-        <i class="bi bi-sign-turn-right" [class.active]="input.active"></i>
-        <div class="device-info">
-          <div class="device-name">{{ input.name }}</div>
-          <div class="device-id">Entr&eacute;e #{{ input.id }}</div>
-        </div>
-      </div>
-      <div class="device-status" [class.status-on]="input.active">
-        <i class="bi" [class.bi-check-circle-fill]="input.active" [class.bi-circle]="!input.active"></i>
-        <span>{{ input.active ? 'Actif' : 'Inactif' }}</span>
-      </div>
-    </div>
+  <div class="connection-pill" [class.offline]="!mqttConnected()">
+    <span class="connection-dot"></span>
+    {{ mqttConnected() ? 'MQTT connecté' : 'Hors ligne' }}
   </div>
-</flow-card>
+</header>
 
-<div class="empty-state" *ngIf="!mqttConnected()">
-  <i class="bi bi-wifi-off"></i>
-  <p>En attente de connexion MQTT...</p>
-</div>
+@if (view() === 'relays') {
+  <app-card [title]="relays().length + ' relais disponibles'">
+    @if (relays().length > 0) {
+      <div class="devices-grid">
+        @for (relay of relays(); track relay.id) {
+          <article class="device-card" [class.is-active]="relay.on">
+            <div class="device-header">
+              <div class="device-icon relay-icon">↯</div>
+              <div class="device-info">
+                <div class="device-name text-slate-900 dark:text-white">{{ relay.name }}</div>
+                <div class="device-id">Sortie {{ formatIndex(relay.id) }}</div>
+              </div>
+              <span class="state-dot"></span>
+            </div>
+            <div class="device-status" [class.status-on]="relay.on">
+              <span>{{ relay.on ? 'Activé' : 'Désactivé' }}</span>
+              <small>{{ relay.on ? 'Circuit actif' : 'Prêt à démarrer' }}</small>
+            </div>
+            <flow-button [variant]="relay.on ? 'danger' : 'primary'" (clicked)="toggleRelay(relay.id, relay.on)">
+              {{ relay.on ? 'Désactiver' : 'Activer' }}
+            </flow-button>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state"><div class="empty-icon">↯</div><p>Aucun relais reçu</p></div>
+    }
+  </app-card>
+} @else {
+  <app-card [title]="inputs().length + ' entrées surveillées'">
+    @if (inputs().length > 0) {
+      <div class="devices-grid">
+        @for (input of inputs(); track input.id) {
+          <article class="device-card" [class.is-active]="input.active">
+            <div class="device-header">
+              <div class="device-icon input-icon">⌁</div>
+              <div class="device-info">
+                <div class="device-name text-slate-900 dark:text-white">{{ input.name }}</div>
+                <div class="device-id">Entrée {{ formatIndex(input.id) }}</div>
+              </div>
+              <span class="state-dot"></span>
+            </div>
+            <div class="device-status" [class.status-on]="input.active">
+              <span>{{ input.active ? 'Actif' : 'Inactif' }}</span>
+              <small>{{ input.active ? 'Signal détecté' : 'Aucun signal' }}</small>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="empty-state"><div class="empty-icon">⌁</div><p>Aucune entrée reçue</p></div>
+    }
+  </app-card>
+}

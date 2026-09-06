@@ -24,8 +24,8 @@ export class LayoutComponent implements OnInit {
   readonly navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/system', label: 'System', icon: '⚙️' },
-    { path: '/relays', label: 'Relays', icon: '🔌' },
-    { path: '/inputs', label: 'Inputs', icon: '📡' },
+    { path: '/relays', label: 'Relais', icon: '🔌' },
+    { path: '/inputs', label: 'Entrées', icon: '📡' },
     { path: '/logs', label: 'Logs', icon: '📋' },
     { path: '/alarms', label: 'Alarms', icon: '🚨' },
     { path: '/config', label: 'Config', icon: '🔧' }
