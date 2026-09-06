@@ -1,2 +1,1 @@
-// DEPRECATED - Not used in current UI
-// Use native checkbox or custom implementation instead
+// REMOVED - Not used in current implementation
