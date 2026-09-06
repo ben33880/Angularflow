@@ -2,12 +2,14 @@ import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, D
 import { NgIf } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
+import { BadgeComponent } from '../../shared/ui/badge.component';
+import { SkeletonComponent } from '../../shared/ui/skeleton.component';
 import type { SystemStatus } from '../../models/flowio.models';
 
 @Component({
   selector: 'app-system',
   standalone: true,
-  imports: [NgIf, CardComponent],
+  imports: [NgIf, CardComponent, BadgeComponent, SkeletonComponent],
   templateUrl: './system.component.html',
   styleUrls: ['./system.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,11 +21,12 @@ export class SystemComponent implements OnInit {
   private readonly systemSignal = signal<SystemStatus | null>(null);
   readonly system = computed(() => this.systemSignal());
   readonly mqttConnected = this.mqtt.connected;
+  readonly loading = signal(true);
 
   constructor() {
-    // Subscribe to ALL MQTT system topics - REAL TIME
     this.mqtt.systemStatus$.subscribe(status => {
       this.systemSignal.set(status);
+      this.loading.set(false);
     });
     
     this.mqtt.systemUptime$.subscribe(uptime => {
