@@ -1,4 +1,4 @@
-import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { MqttClient, IClientOptions } from 'mqtt';
 import { FileConfigService } from './file-config.service';
 import type {
@@ -22,7 +22,6 @@ import type {
 })
 export class MqttService {
   private readonly configService = inject(FileConfigService);
-  private readonly ngZone = inject(NgZone);
   
   private client: MqttClient | null = null;
   private readonly connectedSignal = signal(false);
@@ -81,67 +80,50 @@ export class MqttService {
 
   connect(): void {
     const cfg = this.configService.config();
+    const brokerUrl = `ws://${cfg.mqtt.broker}:${cfg.mqtt.port}${cfg.mqtt.path}`;
     
-    const options: IClientOptions = {
-      clientId: `flowio-web-${Math.random().toString(16).slice(3)}`,
-      username: cfg.mqtt.username || undefined,
-      password: cfg.mqtt.password || undefined,
-      clean: true,
-      reconnectPeriod: 5000,
-      connectTimeout: 30000,
-    };
-
-    const brokerUrl = this.configService.getBrokerUrl();
     console.log('[MQTT] Connecting to', brokerUrl);
 
-    try {
-      this.client = new MqttClient(brokerUrl, options);
+    const options: IClientOptions = {
+      clientId: `flowio-web-${Math.random().toString(16).slice(3)}`,
+      clean: true,
+      reconnectPeriod: 5000,
+      connectTimeout: 10000,
+    };
 
-      this.client.on('connect', () => {
-        console.log('[MQTT] Connected!');
-        this.ngZone.run(() => {
-          this.connectedSignal.set(true);
-          this.subscribe();
-        });
-      });
-
-      this.client.on('error', (error: Error) => {
-        console.error('[MQTT] Error:', error);
-        this.ngZone.run(() => {
-          this.connectedSignal.set(false);
-        });
-      });
-
-      this.client.on('offline', () => {
-        console.log('[MQTT] Offline');
-        this.ngZone.run(() => {
-          this.connectedSignal.set(false);
-        });
-      });
-
-      this.client.on('close', () => {
-        console.log('[MQTT] Connection closed');
-        this.ngZone.run(() => {
-          this.connectedSignal.set(false);
-        });
-      });
-
-      this.client.on('message', (topic: string, payload: Buffer) => {
-        this.ngZone.run(() => {
-          this.handleMessage(topic, payload.toString());
-        });
-      });
-    } catch (error) {
-      console.error('[MQTT] Connection failed:', error);
-      this.connectedSignal.set(false);
+    if (cfg.mqtt.username && cfg.mqtt.password) {
+      options.username = cfg.mqtt.username;
+      options.password = cfg.mqtt.password;
     }
+
+    this.client = new MqttClient(brokerUrl, options);
+    
+    this.client.on('connect', () => {
+      console.log('[MQTT] Connected!');
+      this.connectedSignal.set(true);
+      this.subscribe();
+    });
+
+    this.client.on('close', () => {
+      console.log('[MQTT] Disconnected');
+      this.connectedSignal.set(false);
+    });
+
+    this.client.on('error', (error: Error) => {
+      console.error('[MQTT] Error:', error);
+      this.connectedSignal.set(false);
+    });
+
+    this.client.on('message', (topic: string, message: Buffer) => {
+      const payload = message.toString();
+      this.handleMessage(topic, payload);
+    });
   }
 
   disconnect(): void {
     if (this.client) {
       this.client.end(true);
       this.client = null;
-      this.connectedSignal.set(false);
     }
   }
 
@@ -168,11 +150,8 @@ export class MqttService {
     ];
 
     this.client.subscribe(topics, { qos: 0 }, (err) => {
-      if (err) {
-        console.error('[MQTT] Subscribe error:', err);
-      } else {
-        console.log('[MQTT] Subscribed to', topics.length, 'topics');
-      }
+      if (err) console.error('[MQTT] Subscribe error:', err);
+      else console.log('[MQTT] Subscribed to', topics.length, 'topics');
     });
   }
 
@@ -269,11 +248,8 @@ export class MqttService {
       console.warn('[MQTT] Cannot publish - not connected');
       return;
     }
-    
     this.client.publish(topic, JSON.stringify(payload), { qos: 0 }, (err) => {
-      if (err) {
-        console.error('[MQTT] Publish error:', err);
-      }
+      if (err) console.error('[MQTT] Publish error:', err);
     });
   }
 }
