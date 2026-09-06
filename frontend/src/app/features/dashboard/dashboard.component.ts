@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit {
     const orp = this.orp();
     
     if (ph !== null && (ph < 7.0 || ph > 7.6)) {
-      this.toast.warning(`pH: ${ph} - Hors plage recommandÃ©e (7.0-7.6)`);
+      this.toast.warning(`pH: ${ph} - Hors plage recommandee (7.0-7.6)`);
     }
     
     if (orp !== null && orp < 650) {
@@ -75,18 +75,18 @@ export class DashboardComponent implements OnInit {
   toggleFiltration(): void {
     const newState = !this.statusSignal()?.filtrationOn;
     this.mqtt.setFiltration(newState);
-    this.toast.success(newState ? 'Filtration dÃ©marrÃ©e' : 'Filtration arrÃªtÃ©e');
+    this.toast.success(newState ? 'Filtration demarree' : 'Filtration arretee');
   }
 
   toggleChlorine(): void {
     const newState = !this.statusSignal()?.chlorineDosingOn;
     this.mqtt.setChlorine(newState);
-    this.toast.success(newState ? 'Chlore activÃ©' : 'Chlore dÃ©sactivÃ©');
+    this.toast.success(newState ? 'Chlore active' : 'Chlore desactive');
   }
 
   togglePh(): void {
     const newState = !this.statusSignal()?.phDosingOn;
     this.mqtt.setPhDosing(newState);
-    this.toast.success(newState ? 'pH activÃ©' : 'pH dÃ©sactivÃ©');
+    this.toast.success(newState ? 'pH active' : 'pH desactive');
   }
 }
