@@ -75,6 +75,9 @@ export class MqttService {
   constructor() {}
 
   connect(): void {
+    if (this.connectedSignal()) return;
+    if (this.client) return;
+
     const cfg = this.configService.config();
     const brokerUrl = `ws://${cfg.mqtt.broker}:${cfg.mqtt.port}${cfg.mqtt.path}`;
 
@@ -116,11 +119,12 @@ export class MqttService {
   }
 
   disconnect(): void {
-    if (this.client) {
-      this.client.end(true);
-      this.client = null;
-      this.logger.info('Disconnected by user', 'MQTT');
-    }
+    if (!this.connectedSignal()) return;
+    if (!this.client) return;
+
+    this.client.end(true);
+    this.client = null;
+    this.logger.info('Disconnected by user', 'MQTT');
   }
 
   private subscribe(): void {
