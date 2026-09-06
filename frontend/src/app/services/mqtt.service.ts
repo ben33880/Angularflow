@@ -1,6 +1,6 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, NgZone } from '@angular/core';
+import { MqttClient, IClientOptions } from 'mqtt';
 import { FileConfigService } from './file-config.service';
-import type { AppConfig } from './file-config.service';
 import type {
   PoolStatus,
   PoolTemperatures,
@@ -17,16 +17,12 @@ import type {
   InputState
 } from '../models/flowio.models';
 
-interface MqttMessage {
-  topic: string;
-  payload: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class MqttService {
   private readonly configService = inject(FileConfigService);
+  private readonly ngZone = inject(NgZone);
   
   private client: MqttClient | null = null;
   private readonly connectedSignal = signal(false);
@@ -84,73 +80,100 @@ export class MqttService {
   constructor() {}
 
   connect(): void {
-    const brokerUrl = this.configService.getBrokerUrl();
     const cfg = this.configService.config();
+    
+    const options: IClientOptions = {
+      clientId: `flowio-web-${Math.random().toString(16).slice(3)}`,
+      username: cfg.mqtt.username || undefined,
+      password: cfg.mqtt.password || undefined,
+      clean: true,
+      reconnectPeriod: 5000,
+      connectTimeout: 30000,
+    };
 
+    const brokerUrl = this.configService.getBrokerUrl();
     console.log('[MQTT] Connecting to', brokerUrl);
 
-    this.client = new MqttClient(brokerUrl, `flowio-web-${Math.random().toString(16).slice(3)}`);
-    
-    this.client.onConnect = () => {
-      console.log('[MQTT] Connected!');
-      this.connectedSignal.set(true);
-      this.subscribe();
-    };
+    try {
+      this.client = new MqttClient(brokerUrl, options);
 
-    this.client.onDisconnect = () => {
-      console.log('[MQTT] Disconnected');
+      this.client.on('connect', () => {
+        console.log('[MQTT] Connected!');
+        this.ngZone.run(() => {
+          this.connectedSignal.set(true);
+          this.subscribe();
+        });
+      });
+
+      this.client.on('error', (error: Error) => {
+        console.error('[MQTT] Error:', error);
+        this.ngZone.run(() => {
+          this.connectedSignal.set(false);
+        });
+      });
+
+      this.client.on('offline', () => {
+        console.log('[MQTT] Offline');
+        this.ngZone.run(() => {
+          this.connectedSignal.set(false);
+        });
+      });
+
+      this.client.on('close', () => {
+        console.log('[MQTT] Connection closed');
+        this.ngZone.run(() => {
+          this.connectedSignal.set(false);
+        });
+      });
+
+      this.client.on('message', (topic: string, payload: Buffer) => {
+        this.ngZone.run(() => {
+          this.handleMessage(topic, payload.toString());
+        });
+      });
+    } catch (error) {
+      console.error('[MQTT] Connection failed:', error);
       this.connectedSignal.set(false);
-    };
-
-    this.client.onError = (error: Error) => {
-      console.error('[MQTT] Error:', error);
-      this.connectedSignal.set(false);
-    };
-
-    this.client.onMessage = (topic: string, payload: string) => {
-      this.handleMessage(topic, payload);
-    };
-
-    this.client.connect();
+    }
   }
 
   disconnect(): void {
     if (this.client) {
-      this.client.disconnect();
+      this.client.end(true);
       this.client = null;
+      this.connectedSignal.set(false);
     }
   }
 
   private subscribe(): void {
     if (!this.client) return;
 
-    // Pool status
-    this.client.subscribe('flowio/pool/status');
-    this.client.subscribe('flowio/pool/temperatures');
-    this.client.subscribe('flowio/pool/chemistry');
-    
-    // System
-    this.client.subscribe('flowio/system/status');
-    this.client.subscribe('flowio/system/uptime');
-    this.client.subscribe('flowio/system/memory');
-    this.client.subscribe('flowio/system/wifi');
-    this.client.subscribe('flowio/system/mqtt');
-    
-    // Logs
-    this.client.subscribe('flowio/logs/info');
-    this.client.subscribe('flowio/logs/warn');
-    this.client.subscribe('flowio/logs/error');
-    
-    // Alarms
-    this.client.subscribe('flowio/alarms/active');
-    this.client.subscribe('flowio/alarms/history');
-    
-    // Config
-    this.client.subscribe('flowio/device/config');
-    
-    // Relays & Inputs
-    this.client.subscribe('flowio/relays/state');
-    this.client.subscribe('flowio/inputs/state');
+    const topics = [
+      'flowio/pool/status',
+      'flowio/pool/temperatures',
+      'flowio/pool/chemistry',
+      'flowio/system/status',
+      'flowio/system/uptime',
+      'flowio/system/memory',
+      'flowio/system/wifi',
+      'flowio/system/mqtt',
+      'flowio/logs/info',
+      'flowio/logs/warn',
+      'flowio/logs/error',
+      'flowio/alarms/active',
+      'flowio/alarms/history',
+      'flowio/device/config',
+      'flowio/relays/state',
+      'flowio/inputs/state'
+    ];
+
+    this.client.subscribe(topics, { qos: 0 }, (err) => {
+      if (err) {
+        console.error('[MQTT] Subscribe error:', err);
+      } else {
+        console.log('[MQTT] Subscribed to', topics.length, 'topics');
+      }
+    });
   }
 
   private handleMessage(topic: string, payload: string): void {
@@ -246,159 +269,11 @@ export class MqttService {
       console.warn('[MQTT] Cannot publish - not connected');
       return;
     }
-    this.client.publish(topic, JSON.stringify(payload));
-  }
-}
-
-// Simple MQTT client wrapper
-class MqttClient {
-  private ws: WebSocket | null = null;
-  private clientId: string;
-  private keepAlive = 60;
-
-  onConnect: (() => void) | null = null;
-  onDisconnect: (() => void) | null = null;
-  onError: ((error: Error) => void) | null = null;
-  onMessage: ((topic: string, payload: string) => void) | null = null;
-
-  constructor(
-    private url: string,
-    clientId: string
-  ) {
-    this.clientId = clientId;
-  }
-
-  connect(): void {
-    try {
-      this.ws = new WebSocket(this.url);
-      this.ws.binaryType = 'arraybuffer';
-
-      this.ws.onopen = () => {
-        // Send CONNECT frame
-        this.sendConnect();
-      };
-
-      this.ws.onmessage = (event) => {
-        this.handleMessage(event.data);
-      };
-
-      this.ws.onclose = () => {
-        this.onDisconnect?.();
-      };
-
-      this.ws.onerror = (error) => {
-        this.onError?.(new Error('WebSocket error'));
-      };
-    } catch (e) {
-      this.onError?.(e as Error);
-    }
-  }
-
-  disconnect(): void {
-    if (this.ws) {
-      this.sendDisconnect();
-      this.ws.close();
-      this.ws = null;
-    }
-  }
-
-  subscribe(topic: string): void {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
     
-    // SUBSCRIBE frame
-    const frame = this.createSubscribeFrame(topic);
-    this.ws.send(frame);
-  }
-
-  publish(topic: string, payload: string): void {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
-    
-    // PUBLISH frame
-    const frame = this.createPublishFrame(topic, payload);
-    this.ws.send(frame);
-  }
-
-  private sendConnect(): void {
-    if (!this.ws) return;
-    
-    // Simple CONNECT frame for MQTT over WebSocket
-    const frame = new Uint8Array([
-      0x10, // CONNECT
-      0x00, 0x00, // Remaining length (placeholder)
-      0x00, 0x04, 'M'.charCodeAt(0), 'Q'.charCodeAt(0), 'T'.charCodeAt(0), 'T'.charCodeAt(0), // Protocol name
-      0x04, // Protocol level
-      0x02, // Connect flags
-      0x00, 0x3c, // Keep alive (60s)
-      ...this.encodeString(this.clientId) // Client ID
-    ]);
-    
-    // Update remaining length
-    frame[1] = frame.length - 2;
-    
-    this.ws.send(frame);
-    
-    // Simulate connected after short delay
-    setTimeout(() => this.onConnect?.(), 100);
-  }
-
-  private sendDisconnect(): void {
-    if (!this.ws) return;
-    
-    const frame = new Uint8Array([0xe0, 0x00]); // DISCONNECT
-    this.ws.send(frame);
-  }
-
-  private createSubscribeFrame(topic: string): Uint8Array {
-    const topicBytes = this.encodeString(topic);
-    const frame = new Uint8Array([
-      0x82, // SUBSCRIBE
-      topicBytes.length + 3,
-      0x00, 0x01, // Message ID
-      ...topicBytes,
-      0x00 // QoS 0
-    ]);
-    return frame;
-  }
-
-  private createPublishFrame(topic: string, payload: string): Uint8Array {
-    const topicBytes = this.encodeString(topic);
-    const payloadBytes = new TextEncoder().encode(payload);
-    const frame = new Uint8Array([
-      0x30, // PUBLISH
-      topicBytes.length + payloadBytes.length + 2,
-      ...topicBytes,
-      0x00, 0x01, // Message ID
-      ...payloadBytes
-    ]);
-    return frame;
-  }
-
-  private handleMessage(data: ArrayBuffer): void {
-    const view = new Uint8Array(data);
-    
-    if (view.length < 2) return;
-    
-    const packetType = view[0] & 0xf0;
-    
-    // PUBLISH packet (0x30)
-    if (packetType === 0x30) {
-      // Parse topic and payload
-      const topicLength = (view[2] << 8) | view[3];
-      const topicBytes = view.slice(4, 4 + topicLength);
-      const topic = new TextDecoder().decode(topicBytes);
-      const payloadBytes = view.slice(4 + topicLength + 2); // Skip message ID
-      const payload = new TextDecoder().decode(payloadBytes);
-      
-      this.onMessage?.(topic, payload);
-    }
-  }
-
-  private encodeString(str: string): Uint8Array {
-    const bytes = new TextEncoder().encode(str);
-    const result = new Uint8Array(bytes.length + 2);
-    result[0] = (bytes.length >> 8) & 0xff;
-    result[1] = bytes.length & 0xff;
-    result.set(bytes, 2);
-    return result;
+    this.client.publish(topic, JSON.stringify(payload), { qos: 0 }, (err) => {
+      if (err) {
+        console.error('[MQTT] Publish error:', err);
+      }
+    });
   }
 }
