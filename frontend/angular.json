@@ -10,27 +10,43 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": "dist/flowio-angular",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [],
             "tsConfig": "tsconfig.json",
-            "assets": ["src/favicon.ico", "src/assets"],
-            "styles": ["src/styles.css"],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
             "scripts": []
           },
           "configurations": {
             "production": {
-              "budgets": [{"type": "initial", "maximumWarning": "500kb", "maximumError": "1mb"}],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                }
+              ],
               "outputHashing": "all",
               "optimization": true,
               "sourceMap": false,
               "namedChunks": false
             },
             "docker": {
-              "budgets": [{"type": "initial", "maximumWarning": "500kb"}],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb"
+                }
+              ],
               "outputHashing": "none",
               "optimization": true,
               "sourceMap": false,
@@ -48,8 +64,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": {"buildTarget": "flowio-angular:build:production"},
-            "development": {"buildTarget": "flowio-angular:build:development"}
+            "production": {
+              "buildTarget": "flowio-angular:build:production"
+            },
+            "development": {
+              "buildTarget": "flowio-angular:build:development"
+            }
           },
           "defaultConfiguration": "development"
         }

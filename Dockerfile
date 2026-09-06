@@ -6,8 +6,8 @@ WORKDIR /app
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies required to build the Angular application
+RUN npm ci
 
 # Copy source code
 COPY frontend/ ./
@@ -25,7 +25,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built Angular app from builder stage
-COPY --from=builder /app/dist/angularflow/browser /usr/share/nginx/html
+COPY --from=builder /app/dist/flowio-angular/browser /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
