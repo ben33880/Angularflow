@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
 export const mqttServiceProvider: Provider = {
   provide: MqttService,
   useFactory: () => {
-    if (!environment.production) {
+    if (environment.mockMqtt) {
       return new MockMqttService();
     }
     return new MqttService();
