@@ -4,6 +4,9 @@ import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
 import { StatCardComponent } from '../../shared/ui/stat-card.component';
 import { ButtonComponent } from '../../shared/ui/button.component';
+import { SkeletonComponent } from '../../shared/ui/skeleton.component';
+import { EmptyStateComponent } from '../../shared/ui/empty-state.component';
+import { BadgeComponent } from '../../shared/ui/badge.component';
 import { ToastService } from '../../shared/ui/toast.service';
 import { TemperaturePipe } from '../../shared/pipes/temperature.pipe';
 import type { PoolStatus, PoolChemistry } from '../../models/flowio.models';
@@ -11,7 +14,7 @@ import type { PoolStatus, PoolChemistry } from '../../models/flowio.models';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgIf, NgClass, CardComponent, StatCardComponent, ButtonComponent, TemperaturePipe],
+  imports: [NgIf, NgClass, CardComponent, StatCardComponent, ButtonComponent, SkeletonComponent, EmptyStateComponent, BadgeComponent, TemperaturePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
