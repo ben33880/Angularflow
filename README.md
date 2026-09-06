@@ -9,7 +9,7 @@ Application de monitoring de piscine avec interface moderne et temps réel.
 ## 🚀 Installation
 
 ### Prérequis
-- Node.js 20+
+- Node.js 24 LTS+
 - npm ou yarn
 - Broker MQTT (Mosquitto, EMQX, etc.)
 
@@ -20,6 +20,20 @@ cd frontend
 npm install
 npm start
 ```
+
+### Développement avec Dev Container
+
+Ouvrez le dépôt dans VS Code avec l'extension **Dev Containers**, puis choisissez
+**Reopen in Container**. Les dépendances du dossier `frontend` sont installées
+automatiquement à la création du conteneur.
+
+Dans le terminal du conteneur :
+
+```bash
+npm --prefix frontend start -- --host 0.0.0.0
+```
+
+L'application est ensuite accessible sur [http://localhost:4200](http://localhost:4200).
 
 L'application utilise **MockMQTTService** en dev - pas besoin de broker MQTT.
 
