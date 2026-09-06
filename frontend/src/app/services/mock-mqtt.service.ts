@@ -59,11 +59,13 @@ export class MockMqttService {
   private intervals: number[] = [];
 
   connect(): void {
+    if (this.connectedSignal()) return;
     this.connectedSignal.set(true);
     this.startSimulation();
   }
 
   disconnect(): void {
+    if (!this.connectedSignal()) return;
     this.connectedSignal.set(false);
     this.intervals.forEach(id => clearInterval(id));
     this.intervals = [];
