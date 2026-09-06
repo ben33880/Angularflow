@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FileConfigService } from '../../services/file-config.service';
 import { MqttService } from '../../services/mqtt.service';
@@ -37,7 +37,12 @@ export class ConfigComponent implements OnInit {
   readonly username = signal('');
   readonly password = signal('');
 
-  constructor() {}
+  constructor() {
+    effect(() => {
+      const deviceConfig = this.mqtt.config$();
+      if (deviceConfig) this.configSignal.set(deviceConfig);
+    });
+  }
 
   ngOnInit(): void {
     const cfg = this.fileConfig.config();
@@ -96,6 +101,10 @@ export class ConfigComponent implements OnInit {
       this.saved.set(true);
       this.loading.set(false);
     }, 500);
+  }
+
+  updateDeviceField(field: 'wifiSsid' | 'wifiPassword', value: string): void {
+    this.configSignal.update(config => config ? { ...config, [field]: value } : config);
   }
 
   reboot(): void {

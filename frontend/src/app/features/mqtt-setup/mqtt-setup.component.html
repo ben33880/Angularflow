@@ -8,7 +8,8 @@
       <app-input
         id="broker"
         type="text"
-        [(ngModel)]="broker"
+        [value]="broker()"
+        (valueChange)="broker.set($event)"
         placeholder="192.168.1.100"
         [required]="true"
       />
@@ -21,7 +22,8 @@
         <app-input
           id="port"
           type="number"
-          [(ngModel)]="port"
+          [value]="port()"
+          (valueChange)="port.set($event)"
           placeholder="1883"
           [required]="true"
         />
@@ -32,7 +34,8 @@
         <app-input
           id="path"
           type="text"
-          [(ngModel)]="path"
+          [value]="path()"
+          (valueChange)="path.set($event)"
           placeholder="/mqtt"
           [required]="true"
         />
@@ -45,7 +48,8 @@
         <app-input
           id="username"
           type="text"
-          [(ngModel)]="username"
+          [value]="username()"
+          (valueChange)="username.set($event)"
           placeholder="mqtt_user"
         />
       </div>
@@ -55,7 +59,8 @@
         <app-input
           id="password"
           type="password"
-          [(ngModel)]="password"
+          [value]="password()"
+          (valueChange)="password.set($event)"
           placeholder="••••••••"
         />
       </div>
@@ -83,7 +88,7 @@
     </div>
 
     <div *ngIf="success()" class="success-message">
-      ✓ Connecté·§ avec succès ! Redirection...
+      ✓ Connecté avec succès ! Redirection...
     </div>
   </app-card>
 </div>

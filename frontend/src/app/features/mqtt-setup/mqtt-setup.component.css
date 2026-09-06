@@ -11,7 +11,7 @@ h1 {
 }
 
 .subtitle {
-  color: var(--text-secondary);
+  color: #64748b;
   margin-bottom: 2rem;
 }
 
@@ -23,13 +23,13 @@ h1 {
   display: block;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: var(--text-primary);
+  color: #0f172a;
 }
 
 .form-group small {
   display: block;
   margin-top: 0.5rem;
-  color: var(--text-secondary);
+  color: #64748b;
   font-size: 0.875rem;
 }
 
@@ -50,7 +50,7 @@ h1 {
   padding: 1rem;
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--radius);
+  border-radius: 0.5rem;
   color: #ef4444;
 }
 
@@ -59,7 +59,7 @@ h1 {
   padding: 1rem;
   background: rgba(34, 197, 94, 0.1);
   border: 1px solid rgba(34, 197, 94, 0.3);
-  border-radius: var(--radius);
+  border-radius: 0.5rem;
   color: #22c55e;
 }
 

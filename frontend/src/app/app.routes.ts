@@ -37,6 +37,10 @@ export const routes: Routes = [
         loadComponent: () => import('./features/config/config.component').then(m => m.ConfigComponent)
       },
       {
+        path: 'setup',
+        loadComponent: () => import('./features/mqtt-setup/mqtt-setup.component').then(m => m.MqttSetupComponent)
+      },
+      {
         path: 'relays',
         loadComponent: () => import('./features/devices/devices.component').then(m => m.DevicesComponent)
       },

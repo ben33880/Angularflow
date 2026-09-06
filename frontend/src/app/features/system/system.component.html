@@ -42,7 +42,7 @@
       <div class="perf-value">
         <i class="bi bi-memory"></i>
         {{ formatMemory(currentSystem.freeMemory) }}
-        <small class="perf-percent">({{ ((currentSystem.freeMemory / currentSystem.totalMemory) * 100) | number:'1.0-0' }}%)</small>
+        <small class="perf-percent">({{ currentSystem.totalMemory > 0 ? ((currentSystem.freeMemory / currentSystem.totalMemory) * 100 | number:'1.0-0') : 0 }}%)</small>
       </div>
     </div>
     <div class="perf-item">

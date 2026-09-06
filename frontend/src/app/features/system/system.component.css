@@ -1,1 +1,17 @@
-/* System styles moved to template with Tailwind */
+.page-title { display: flex; align-items: center; gap: 0.75rem; margin: 0 0 1.5rem; color: #0f172a; font-size: 1.875rem; font-weight: 700; }
+.status-grid, .perf-grid, .network-grid { display: grid; gap: 1rem; }
+.status-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.perf-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.network-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.status-item, .perf-item, .network-item { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; background: #fff; }
+.status-item { flex-wrap: wrap; }
+.status-value, .perf-value, .network-value { font-weight: 600; }
+.status-value { margin-left: auto; }
+.status-value.good, .network-value.good { color: #16a34a; }
+.status-value.bad, .network-value.bad { color: #dc2626; }
+.perf-label, .network-label { color: #64748b; font-size: 0.875rem; }
+.perf-value { display: block; color: #0f172a; font-size: 1.125rem; }
+.network-item { align-items: flex-start; }
+.network-sub { color: #64748b; font-size: 0.8rem; }
+.error-alert { padding: 1rem; border: 1px solid #fecaca; border-radius: 0.75rem; color: #b91c1c; background: #fef2f2; }
+@media (max-width: 768px) { .status-grid, .perf-grid, .network-grid { grid-template-columns: 1fr; } }

@@ -31,7 +31,6 @@
           />
 
           <app-input
-            id="path"
             label="Path WebSocket"
             placeholder="/mqtt"
             [(value)]="path"
@@ -66,7 +65,7 @@
 
           @if (saved()) {
             <span class="text-sm text-green-600 dark:text-green-400 font-medium">
-              ✓ Sauvegardé·§ ! Reconnexion...
+              ✓ Sauvegardé ! Reconnexion...
             </span>
           }
         </div>

@@ -45,6 +45,7 @@ export class DashboardComponent implements OnInit {
     const value = this.orp();
     return value === null ? '--' : `${Math.round(value)} mV`;
   });
+  private lastAlertAt = new Map<string, number>();
 
   constructor() {
     effect(() => {
@@ -74,29 +75,37 @@ export class DashboardComponent implements OnInit {
     const orp = this.orp();
     
     if (ph !== null && (ph < 7.0 || ph > 7.6)) {
-      this.toast.warning(`pH: ${ph} - Hors plage recommandee (7.0-7.6)`);
+      this.notifyOnce('ph', `pH : ${ph.toFixed(2)} - Hors plage recommandée (7.0-7.6)`, 'warning');
     }
     
     if (orp !== null && orp < 650) {
-      this.toast.info(`ORP: ${orp} mV - Niveau bas`);
+      this.notifyOnce('orp', `ORP : ${Math.round(orp)} mV - Niveau bas`, 'info');
     }
+  }
+
+  private notifyOnce(key: string, message: string, type: 'warning' | 'info'): void {
+    const now = Date.now();
+    const last = this.lastAlertAt.get(key) ?? 0;
+    if (now - last < 30000) return;
+    this.lastAlertAt.set(key, now);
+    type === 'warning' ? this.toast.warning(message) : this.toast.info(message);
   }
 
   toggleFiltration(): void {
     const newState = !this.statusSignal()?.filtrationOn;
     this.mqtt.setFiltration(newState);
-    this.toast.success(newState ? 'Filtration demarree' : 'Filtration arretee');
+    this.toast.success(newState ? 'Filtration démarrée' : 'Filtration arrêtée');
   }
 
   toggleChlorine(): void {
     const newState = !this.statusSignal()?.chlorineDosingOn;
     this.mqtt.setChlorine(newState);
-    this.toast.success(newState ? 'Chlore active' : 'Chlore desactive');
+    this.toast.success(newState ? 'Chlore activé' : 'Chlore désactivé');
   }
 
   togglePh(): void {
     const newState = !this.statusSignal()?.phDosingOn;
     this.mqtt.setPhDosing(newState);
-    this.toast.success(newState ? 'pH active' : 'pH desactive');
+    this.toast.success(newState ? 'pH activé' : 'pH désactivé');
   }
 }

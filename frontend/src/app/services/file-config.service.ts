@@ -28,8 +28,6 @@ const DEFAULT_CONFIG: AppConfig = {
   }
 };
 
-const STORAGE_KEY = 'flowio_mqtt_config';
-
 @Injectable({
   providedIn: 'root'
 })
@@ -65,7 +63,6 @@ export class FileConfigService {
     };
     
     this.configSignal.set(updated);
-    await this.loadConfig();
   }
 
   resetConfig(): void {
