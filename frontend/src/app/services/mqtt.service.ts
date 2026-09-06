@@ -29,6 +29,10 @@ export class MqttService {
   private readonly connectedSignal = signal(false);
   readonly connected = computed(() => this.connectedSignal());
 
+  private reconnectAttempts = 0;
+  private readonly maxReconnectAttempts = 5;
+  private reconnectTimeout: number | null = null;
+
   private readonly poolStatusSignal = signal<PoolStatus | null>(null);
   private readonly temperaturesSignal = signal<PoolTemperatures | null>(null);
   private readonly chemistrySignal = signal<PoolChemistry | null>(null);
@@ -75,6 +79,11 @@ export class MqttService {
   constructor() {}
 
   connect(): void {
+    if (this.client) {
+      this.logger.warn('Already connected', 'MQTT');
+      return;
+    }
+
     const cfg = this.configService.config();
     const brokerUrl = `ws://${cfg.mqtt.broker}:${cfg.mqtt.port}${cfg.mqtt.path}`;
 
@@ -97,12 +106,15 @@ export class MqttService {
     this.client.on('connect', () => {
       this.logger.info('Connected', 'MQTT');
       this.connectedSignal.set(true);
+      this.reconnectAttempts = 0;
       this.subscribe();
     });
 
     this.client.on('close', () => {
       this.logger.warn('Disconnected', 'MQTT');
       this.connectedSignal.set(false);
+      this.client = null;
+      this.tryReconnect();
     });
 
     this.client.on('error', (error) => {
@@ -110,12 +122,38 @@ export class MqttService {
       this.connectedSignal.set(false);
     });
 
+    this.client.on('offline', () => {
+      this.logger.warn('Client offline', 'MQTT');
+    });
+
     this.client.on('message', (topic: string, message: Buffer) => {
       this.handleMessage(topic, message.toString());
     });
   }
 
+  private tryReconnect(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      this.logger.error(`Max reconnect attempts (${this.maxReconnectAttempts}) reached`, 'MQTT');
+      return;
+    }
+
+    this.reconnectAttempts++;
+    const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+    
+    this.logger.info(`Reconnect attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${delay}ms`, 'MQTT');
+
+    this.reconnectTimeout = window.setTimeout(() => {
+      this.reconnectTimeout = null;
+      this.connect();
+    }, delay);
+  }
+
   disconnect(): void {
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+    
     if (this.client) {
       this.client.end(true);
       this.client = null;
