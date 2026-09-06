@@ -15,7 +15,9 @@
             "outputPath": "dist/flowio-angular",
             "index": "src/index.html",
             "browser": "src/main.ts",
-            "polyfills": [],
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.json",
             "assets": [
               "src/favicon.ico",
