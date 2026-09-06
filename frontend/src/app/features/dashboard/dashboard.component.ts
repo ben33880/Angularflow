@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ChangeDetectionStrategy, DestroyRef, effect } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -39,14 +39,16 @@ export class DashboardComponent implements OnInit {
   readonly orp = computed(() => this.chemistrySignal()?.orp ?? this.statusSignal()?.orp ?? null);
 
   constructor() {
-    this.mqtt.poolStatus$.subscribe(status => {
+    effect(() => {
+      const status = this.mqtt.poolStatus$();
       if (status) {
         this.statusSignal.set(status);
         this.loading.set(false);
       }
     });
     
-    this.mqtt.chemistry$.subscribe(chem => {
+    effect(() => {
+      const chem = this.mqtt.chemistry$();
       if (chem) {
         this.chemistrySignal.set(chem);
         this.checkAlerts();
