@@ -37,12 +37,12 @@
       <!-- Temperature -->
       <app-stat-card
         label="Tempé§°rature"
-        [value]="(temperature | temperature) ?? '--'"
+        [value]="(temperature() | temperature) ?? '--'"
         icon="🌡️"
       >
         <div class="mt-4">
-          <app-badge [variant]="temperature && temperature >= 26 && temperature <= 30 ? 'success' : 'warning'">
-            {{ temperature && temperature >= 26 && temperature <= 30 ? '✓ Idé§°ale' : '⚠ Ajuster' }}
+          <app-badge [variant]="(temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? 'success' : 'warning'">
+            {{ (temperature() ?? 0) >= 26 && (temperature() ?? 0) <= 30 ? '✓ Idé§°ale' : '⚠ Ajuster' }}
           </app-badge>
         </div>
       </app-stat-card>
@@ -50,12 +50,12 @@
       <!-- pH -->
       <app-stat-card
         label="pH"
-        [value]="(ph ?? '--').toString()"
+        [value]="(ph() ?? '--').toString()"
         icon="🧪"
       >
         <div class="mt-4 flex items-center gap-2">
-          <app-badge [variant]="ph && ph >= 7.0 && ph <= 7.6 ? 'success' : ph && ph >= 6.8 && ph <= 7.8 ? 'warning' : 'error'">
-            {{ ph && ph >= 7.0 && ph <= 7.6 ? '✓ Bon' : ph && ph >= 6.8 && ph <= 7.8 ? '⚠ Ajuster' : '✕ Critique' }}
+          <app-badge [variant]="(ph() ?? 0) >= 7.0 && (ph() ?? 0) <= 7.6 ? 'success' : (ph() ?? 0) >= 6.8 && (ph() ?? 0) <= 7.8 ? 'warning' : 'error'">
+            {{ (ph() ?? 0) >= 7.0 && (ph() ?? 0) <= 7.6 ? '✓ Bon' : (ph() ?? 0) >= 6.8 && (ph() ?? 0) <= 7.8 ? '⚠ Ajuster' : '✕ Critique' }}
           </app-badge>
         </div>
       </app-stat-card>
@@ -63,12 +63,12 @@
       <!-- ORP -->
       <app-stat-card
         label="ORP"
-        [value]="(orp ?? '--').toString() + ' mV'"
+        [value]="(orp() ?? '--').toString() + ' mV'"
         icon="⚡"
       >
         <div class="mt-4 flex items-center gap-2">
-          <app-badge [variant]="orp && orp >= 650 ? 'success' : orp && orp >= 600 ? 'warning' : 'error'">
-            {{ orp && orp >= 650 ? '✓ Bon' : orp && orp >= 600 ? '⚠ Bas' : '✕ Critique' }}
+          <app-badge [variant]="(orp() ?? 0) >= 650 ? 'success' : (orp() ?? 0) >= 600 ? 'warning' : 'error'">
+            {{ (orp() ?? 0) >= 650 ? '✓ Bon' : (orp() ?? 0) >= 600 ? '⚠ Bas' : '✕ Critique' }}
           </app-badge>
         </div>
       </app-stat-card>
