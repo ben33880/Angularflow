@@ -1,101 +1,243 @@
-# Flow.io
+# Angularflow
 
-Contrô·§·leur intelligent pour piscine avec interface web moderne et architecture 100% MQTT.
+**Angular 22 + MQTT + Tailwind CSS 4** - Dashboard de monitoring pour piscine FlowIO
 
-![Status](https://img.shields.io/badge/status-production-green)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Node](https://img.shields.io/badge/node-24 LTS-green)
-![Angular](https://img.shields.io/badge/Angular-20+-red)
-
----
-
-## 📡 Architecture
-
-```
-┌─────────────────┐         MQTT          ┌─────────────────┐
-│   Flow.io       │◄──────────────────────►│   Frontend      │
-│   (ESP32)       │      (flowio:1883)    │   (Angular)     │
-│                 │                       │                 │
-│ - Capteurs      │                       │ - Dashboard     │
-│ - Relays        │                       │ - Config        │
-│ - PID           │                       │ - Logs          │
-│ - WiFi/MQTT     │                       │ - Alarms        │
-└─────────────────┘                       └─────────────────┘
-         │                                        │
-         │                                        │
-         ▼                                        ▼
-┌─────────────────┐                       ┌─────────────────┐
-│   Pool          │                       │   Docker        │
-│ - Temp          │                       │   Nginx         │
-│ - pH            │                       │   Config        │
-│ - ORP           │                       │                 │
-└─────────────────┘                       └─────────────────┘
-```
-
-**Caracté·§ristiques :**
-- ✅ **100% MQTT** - Aucune API HTTP
-- ✅ **Temps réel** - Push natif via MQTT
-- ✅ **Docker-ready** - `docker-compose.yml` inclus
-- ✅ **Config persistante** - Fichier `config.json` monté·§ en volume
-- ✅ **SPA moderne** - Angular 20+, signals, standalone components
-- ✅ **Proxmox LXC** - Script d'install auto pour containers
-- ✅ **Web UI** - Configuration via l'interface (zè§°ro CLI)
+[![Angular](https://img.shields.io/badge/Angular-22.1.5-DD0031?style=flat&logo=angular)](https://angular.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.1.12-06B6D4?style=flat&logo=tailwindcss)](https://tailwindcss.com)
+[![MQTT](https://img.shields.io/badge/MQTT-5.10.0-660066?style=flat&logo=mqtt)](https://mqtt.org)
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Features
 
-### Prerequis
+- ✅ **Angular 22.1.5** - Dernière version LTS
+- ✅ **Signaux** - Réactivité¹¹ moderne (plus de Zone.js)
+- ✅ **MockMQTT** - Mode dev sans broker
+- ✅ **Tailwind CSS 4** - Utilitaires CSS
+- ✅ **TypeScript strict** - Typage fort
+- ✅ **Production-ready** - Optimisé²²
 
-- Docker & Docker Compose
-- Ou Node.js 24+ & npm 10+
-- Ou Proxmox VE (pour LXC)
+---
 
-### Option 1 : Docker
+## 📋 Prérequis
+
+- Node.js 20.x ou supérieur
+- npm 10.x ou supérieur
+- Broker MQTT (Mosquitto, EMQX, etc.) - pour la prod
+
+---
+
+## 🔧 Installation
+
+### 1. Cloner le repo
 
 ```bash
-# 1. Cloner
 git clone https://github.com/ben33880/Angularflow.git
-cd Angularflow
-
-# 2. Lancer
-docker-compose up -d
-
-# 3. Ouvrir
-# http://localhost
-
-# 4. Configurer via l'UI
-# Page Config → Modifier broker/port → Sauvegarder
+cd Angularflow/frontend
 ```
 
-### Option 2 : Proxmox LXC
+### 2. Installer les dépendances
 
 ```bash
-# 1. Créer container
-pct create 100 local:vztmpl/debian-12-standard \
-  --rootfs local-lvm:4 \
-  --memory 512 \
-  --cores 1 \
-  --hostname flowio \
-  --unprivileged 1
-
-# 2. Installer
-pct exec 100 -- bash < proxmox/install-flowio.sh
-
-# 3. Ouvrir
-# http://<IP_LXC>
-
-# 4. Configurer via l'UI
-# Page Config → Modifier broker/port → Sauvegarder
-```
-
-### Option 3 : Dev local
-
-```bash
-cd frontend
 npm install
+```
+
+### 3. Démarrer en dev
+
+```bash
 npm start
-# http://localhost:4200
+```
+
+**Ouvre :** http://localhost:4200
+
+---
+
+## ⚙️ Configuration
+
+### Mode Dev (MockMQTT)
+
+Par défaut, le dev utilise des **donnees simulé³³** (pas besoin de broker MQTT).
+
+**Fichier :** `src/environments/environment.ts`
+
+```typescript
+export const environment = {
+  production: false,
+  mockMqtt: true  // true = données simulé³³
+};
+```
+
+### Mode Prod (Vrai MQTT)
+
+**Fichier :** `src/environments/environment.prod.ts`
+
+```typescript
+export const environment = {
+  production: true,
+  mockMqtt: false  // false = vrai broker MQTT
+};
+```
+
+### Configuration MQTT
+
+**Broker requis :**
+- Protocole : WebSocket (`ws://`)
+- Port : `9001` (par défaut)
+- Path : `/mqtt`
+
+**Topics souscrits :**
+
+| Topic | Type | Description |
+|-------|------|-------------|
+| `flowio/pool/status` | PoolStatus | Status piscine (temp, pH, ORP) |
+| `flowio/pool/temperatures` | PoolTemperatures | Temp (bassin, retour, equipement, ext) |
+| `flowio/pool/chemistry` | PoolChemistry | Chimie (pH, ORP) |
+| `flowio/system/status` | SystemStatus | Status système |
+| `flowio/system/uptime` | SystemUptime | Uptime |
+| `flowio/system/memory` | SystemMemory | Mémoire |
+| `flowio/system/wifi` | SystemWifi | WiFi (RSSI, SSID) |
+| `flowio/system/mqtt` | SystemMqtt | MQTT (connected, broker) |
+| `flowio/logs/info` | LogEntry | Logs info |
+| `flowio/logs/warn` | LogEntry | Logs warn |
+| `flowio/logs/error` | LogEntry | Logs error |
+| `flowio/alarms/active` | AlarmEntry[] | Alarmes actives |
+| `flowio/device/config` | DeviceConfig | Config appareil |
+| `flowio/relays/state` | RelayState[] | Status relais |
+| `flowio/inputs/state` | InputState[] | Status entré³³ |
+
+**Topics publi (commandes) :**
+
+| Topic | Payload | Description |
+|-------|---------|-------------|
+| `flowio/cmd/pool/filtration` | `{ on: boolean }` | Filtration ON/OFF |
+| `flowio/cmd/pool/chlorine` | `{ on: boolean }` | Chlore ON/OFF |
+| `flowio/cmd/pool/ph` | `{ on: boolean }` | pH dosing ON/OFF |
+| `flowio/cmd/relay/{id}` | `{ on: boolean }` | Relais {id} ON/OFF |
+| `flowio/cmd/config/update` | `DeviceConfig` | Màj config |
+| `flowio/cmd/system/reboot` | `{}` | Reboot système |
+| `flowio/cmd/alarm/ack` | `{ id: string }` | Ack alarme |
+
+---
+
+## 🏗️ Build Production
+
+### 1. Build
+
+```bash
+npm run build -- --configuration production
+```
+
+**Output :** `dist/frontend/`
+
+### 2. Déployer
+
+**Option 1 : Nginx**
+
+```nginx
+server {
+    listen 80;
+    server_name ton-domaine.com;
+    root /var/www/angularflow;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Gzip
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript;
+}
+```
+
+**Option 2 : Docker**
+
+```dockerfile
+FROM nginx:alpine
+COPY dist/frontend/ /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+**Option 3 : Firebase Hosting**
+
+```bash
+npm install -g firebase-tools
+firebase login
+firebase init
+firebase deploy
+```
+
+---
+
+## 🧪 Tests
+
+### Unitaires
+
+```bash
+npm test
+```
+
+### E2E (Playwright)
+
+```bash
+npm install -D @playwright/test
+npx playwright install
+npx playwright test
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Probl : Build échoue
+
+```bash
+# Nettoyer cache
+rm -rf node_modules package-lock.json
+npm install
+npm run build -- --configuration production
+```
+
+### Probl : WebSocket MQTT ne connecte pas
+
+**Vrifier :**
+1. Broker MQTT accepte WebSocket (port 9001)
+2. CORS activé²² sur broker
+3. Firewall autorise port 9001
+
+**Test :**
+```bash
+# Avec mosquitto
+mosquitto_sub -h localhost -p 9001 -t 'flowio/#' -v
+```
+
+### Probl : Styles cassé²² après Tailwind 4
+
+Tailwind 4 utilise `@import "tailwindcss"` (plus de `@tailwind`).
+
+**Fichier :** `src/styles.css`
+
+```css
+@import "tailwindcss";
+```
+
+### Probl : MockMQTT toujours actif en prod
+
+**Vrifier :** `environment.prod.ts`
+
+```typescript
+export const environment = {
+  production: true,
+  mockMqtt: false  // ← Doit tre false
+};
+```
+
+**Build :**
+```bash
+npm run build -- --configuration production
 ```
 
 ---
@@ -104,214 +246,113 @@ npm start
 
 ```
 Angularflow/
-├── config.json              # Config MQTT (volume Docker)
-├── docker-compose.yml       # Orchestration Docker
-├── Dockerfile               # Build Angular + Nginx
-├── nginx.conf               # Config serveur web
-├── README.md
-├── proxmox/                 # Template LXC Proxmox
-│   ├── README.md
-│   └── install-flowio.sh
-└── frontend/
-    └── src/app/
-        ├── features/        # Pages
-        ├── models/          # Types
-        ├── services/        # MQTT, config
-        └── shared/          # UI components
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── features/
+│   │   │   │   └── dashboard/      # Dashboard component
+│   │   │   ├── services/
+│   │   │   │   ├── mqtt.service.ts        # Service MQTT
+│   │   │   │   ├── mock-mqtt.service.ts   # Mock pour dev
+│   │   │   │   ├── mqtt.provider.ts       # Factory provider
+│   │   │   │   ├── logger.service.ts      # Logger
+│   │   │   │   └── file-config.service.ts # Config
+│   │   │   ├── models/
+│   │   │   │   └── flowio.models.ts       # Types
+│   │   │   ├── shared/
+│   │   │   │   └── ui/                   # Components UI
+│   │   │   ├── app.config.ts             # Config app
+│   │   │   └── app.routes.ts             # Routes
+│   │   ├── environments/
+│   │   │   ├── environment.ts            # Dev
+│   │   │   └── environment.prod.ts       # Prod
+│   │   ├── styles.css                    # Tailwind 4
+│   │   └── main.ts
+│   ├── angular.json
+│   ├── package.json
+│   └── tsconfig.json
+└── README.md
 ```
 
 ---
 
-## 📡 Topics MQTT
+## 🔒 Sécurité
 
-### Publication (Backend → Frontend)
+### Production Checklist
 
-| Topic | Payload | Fré·§quence |
-|-------|---------|-------------|
-| `flowio/pool/status` | `{ temperature, ph, orp, filtrationOn, chlorineDosingOn, phDosingOn }` | 1 Hz |
-| `flowio/pool/temperatures` | `{ basin, return, equipment, outdoor? }` | 1 Hz |
-| `flowio/pool/chemistry` | `{ ph, orp, redox?, tds? }` | 1 Hz |
-| `flowio/system/status` | `{ uptime, freeMemory, totalMemory, wifiRssi, mqttConnected }` | 5s |
-| `flowio/system/uptime` | `{ uptime }` | 60s |
-| `flowio/system/memory` | `{ free, total }` | 60s |
-| `flowio/system/wifi` | `{ rssi, ssid? }` | 60s |
-| `flowio/system/mqtt` | `{ connected, broker? }` | 60s |
-| `flowio/logs/info` | `{ timestamp, level, message, module? }` | Event |
-| `flowio/logs/warn` | `{ timestamp, level, message, module? }` | Event |
-| `flowio/logs/error` | `{ timestamp, level, message, module? }` | Event |
-| `flowio/alarms/active` | `AlarmEntry[]` | Event |
-| `flowio/alarms/history` | `AlarmEntry[]` | Event |
-| `flowio/device/config` | `DeviceConfig` | Event |
-| `flowio/relays/state` | `RelayState[]` | Event |
-| `flowio/inputs/state` | `InputState[]` | Event |
+- ✅ Activer HTTPS
+- ✅ Authentifier MQTT (username/password)
+- ✅ Rate limiting sur commandes
+- ✅ Valider inputs utilisateur
+- ✅ CORS restreint
+- ✅ Headers de sécurité (CSP, X-Frame-Options)
 
-### Commandes (Frontend → Backend)
+### Exemple nginx.conf
 
-| Topic | Payload | Description |
-|-------|---------|-------------|
-| `flowio/cmd/pool/filtration` | `{ on: boolean }` | Filtration |
-| `flowio/cmd/pool/chlorine` | `{ on: boolean }` | Chlore |
-| `flowio/cmd/pool/ph` | `{ on: boolean }` | pH |
-| `flowio/cmd/relay/{1-8}` | `{ on: boolean }` | Relay |
-| `flowio/cmd/config/update` | `DeviceConfig` | Config |
-| `flowio/cmd/system/reboot` | `{}` | Reboot |
-| `flowio/cmd/alarm/ack` | `{ id: string }` | Ack alarm |
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name ton-domaine.com;
 
----
+    ssl_certificate /etc/ssl/certs/ton-cert.pem;
+    ssl_certificate_key /etc/ssl/private/ton-key.pem;
 
-## 🔧 Configuration
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
 
-### config.json
-
-```json
-{
-  "mqtt": {
-    "broker": "192.168.1.100",
-    "port": 1883,
-    "path": "/mqtt",
-    "username": "",
-    "password": ""
-  },
-  "device": {
-    "name": "Flow.io Pool Controller",
-    "location": "Pool House"
-  }
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 }
 ```
 
-### Via l'interface web
-
-1. Ouvrir `http://<IP>`
-2. Aller dans **Config**
-3. Modifier broker/port/auth
-4. Sauvegarder → Reconnect auto
-
-### Docker
-
-```yaml
-volumes:
-  - ./config.json:/usr/share/nginx/html/config.json:ro
-```
-
 ---
 
-## 🔒 Sé-•curité·§
+## 📊 Performance
 
-### Bonnes pratiques
-
-1. **Broker MQTT** :
-   - Auth (username/password)
-   - TLS (wss://)
-   - Firewall
-
-2. **Docker** :
-   - Réseaux isolé·§s
-   - Updates ré-•gulierement
-
-3. **Config** :
-   - `.gitignore` pour `config.json`
-   - Rotater credentials
-
-4. **Network** :
-   - VLAN IoT
-   - Client isolation WiFi
-
-5. **Proxmox LXC** :
-   - Containers unprivileged
-   - Firewall Proxmox
-   - Backups automatiques
-
-### Mosquitto (auth)
-
-```conf
-allow_anonymous false
-password_file /etc/mosquitto/passwd
-mosquitto_passwd -c /etc/mosquitto/passwd mqtt_user
-```
-
----
-
-## 🛠 Dé-•veloppement
+### Bundle Size
 
 ```bash
-cd frontend
-npm install
-npm start
-npm run build -- --configuration production
+npm install -D webpack-bundle-analyzer
+ng build --stats-json
+npx webpack-bundle-analyzer dist/frontend/stats.json
 ```
 
-### Stack
+### Optimisations
 
-- Angular 20+ (standalone)
-- Signals
-- OnPush
-- TypeScript strict
-
----
-
-## 📊 Features
-
-- **Dashboard** : Temp, pH, ORP, contrôles
-- **System** : Uptime, mémoire, WiFi, MQTT
-- **Logs** : INFO, WARN, ERROR (temps réel)
-- **Alarms** : Actives, historique, ack
-- **Config** : MQTT, device, reboot
-- **Relays/Inputs** : Status, contrôles
-
----
-
-## 🐛 Troubleshooting
-
-### Frontend ne se connecte pas
-
-```bash
-cat config.json
-docker logs flowio-frontend
-docker-compose restart flowio-frontend
-```
-
-### MQTT ne fonctionne pas
-
-```bash
-docker exec -it mosquitto mosquitto_sub -v -t 'flowio/#'
-mosquitto_pub -t 'flowio/cmd/pool/filtration' -m '{"on":true}'
-```
-
-### Proxmox LXC
-
-```bash
-pct exec 100 -- ufw allow 80
-pct exec 100 -- ufw allow 1883
-```
-
----
-
-## 📝 License
-
-MIT
+- ✅ `OnPush` change detection
+- ✅ Lazy loading des features
+- ✅ Tree-shaking
+- ✅ AOT compilation
+- ✅ Production build optimisé²²
 
 ---
 
 ## 🤝 Contributing
 
 1. Fork
-2. Branche (`feature/xxx`)
+2. `git checkout -b feature/ma-feature`
 3. Commit
-4. PR
+4. Push
+5. PR
+
+---
+
+## 📄 License
+
+MIT - Voir `LICENSE`
 
 ---
 
 ## 📞 Support
 
 - Issues : https://github.com/ben33880/Angularflow/issues
-- Discussions : https://github.com/ben33880/Angularflow/discussions
+- Email : benj.moreau33@gmail.com
 
 ---
 
-## 🖥 Dé-•ploiement
-
-| Plateforme | Guide | Status |
-|------------|-------|--------|
-| Docker | Quick Start | ✅ |
-| Proxmox LXC | `proxmox/README.md` | ✅ |
-| Dev local | Quick Start | ✅ |
+**Dé²² avec ❤️ par ben33880**
