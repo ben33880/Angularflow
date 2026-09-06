@@ -10,21 +10,12 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       @for (i of [1,2,3,4]; track i) {
         <div class="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700">
-          <app-skeleton width="w-12" height="h-12" rounded="rounded-lg" />
-          <app-skeleton width="w-24" height="h-8" class="mt-4" />
-          <app-skeleton width="w-16" height="h-4" class="mt-2" />
+          <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse"></div>
+          <div class="w-24 h-8 bg-slate-200 dark:bg-slate-700 rounded mt-4 animate-pulse"></div>
+          <div class="w-16 h-4 bg-slate-200 dark:bg-slate-700 rounded mt-2 animate-pulse"></div>
         </div>
       }
     </div>
-  }
-
-  <!-- Empty State -->
-  @if (!loading() && !status()) {
-    <app-empty-state
-      icon="📊"
-      title="En attente des données"
-      description="Le contrôleur Flow.io n'a pas encore envoyé de données. Vérifiez la connexion MQTT."
-    />
   }
 
   <!-- Stats Grid -->
@@ -37,9 +28,9 @@
         icon="🌡️"
       >
         <div class="mt-4">
-          <app-badge [variant]="temperature && temperature >= 26 && temperature <= 30 ? 'success' : 'warning'">
-            {{ temperature && temperature >= 26 && temperature <= 30 ? '✓ Idé§°ale' : '⚠ Ajuster' }}
-          </app-badge>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+            ✓ Idé§°ale
+          </span>
         </div>
       </app-stat-card>
 
@@ -50,9 +41,9 @@
         icon="🧪"
       >
         <div class="mt-4 flex items-center gap-2">
-          <app-badge [variant]="ph && ph >= 7.0 && ph <= 7.6 ? 'success' : ph && ph >= 6.8 && ph <= 7.8 ? 'warning' : 'error'">
-            {{ ph && ph >= 7.0 && ph <= 7.6 ? '✓ Bon' : ph && ph >= 6.8 && ph <= 7.8 ? '⚠ Ajuster' : '✕ Critique' }}
-          </app-badge>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+            ✓ Bon
+          </span>
         </div>
       </app-stat-card>
 
@@ -63,9 +54,9 @@
         icon="⚡"
       >
         <div class="mt-4 flex items-center gap-2">
-          <app-badge [variant]="orp && orp >= 650 ? 'success' : orp && orp >= 600 ? 'warning' : 'error'">
-            {{ orp && orp >= 650 ? '✓ Bon' : orp && orp >= 600 ? '⚠ Bas' : '✕ Critique' }}
-          </app-badge>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
+            ✓ Bon
+          </span>
         </div>
       </app-stat-card>
 
@@ -96,8 +87,8 @@
           <span class="text-3xl">💧</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
-          <div class="toggle-label">
-            <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.filtrationOn ? 'Activé§°e' : 'Dé§°sactivé§°e' }}</span>
+          <div>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.filtrationOn ? 'Activé§°e' : 'Dé§°sactivé§°e' }}</span>
             <span class="text-xs text-slate-500 dark:text-slate-400">Contrô§··le manuel</span>
           </div>
           <app-button
@@ -120,8 +111,8 @@
           <span class="text-3xl">🧂</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
-          <div class="toggle-label">
-            <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.chlorineDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
+          <div>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.chlorineDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
             <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.orp ?? '--' }} mV</span>
           </div>
           <app-button
@@ -144,8 +135,8 @@
           <span class="text-3xl">🔬</span>
         </div>
         <div class="flex items-center justify-between p-4 bg-slate-100 dark:bg-slate-700 rounded-lg mt-4">
-          <div class="toggle-label">
-            <span class="font-semibold text-slate-900 dark:text-white">{{ status()?.phDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
+          <div>
+            <span class="font-semibold text-slate-900 dark:text-white block">{{ status()?.phDosingOn ? 'Activé§°' : 'Dé§°sactivé§°' }}</span>
             <span class="text-xs text-slate-500 dark:text-slate-400">Niveau: {{ chemistry()?.ph ?? '--' }}</span>
           </div>
           <app-button
