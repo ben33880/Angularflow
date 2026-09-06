@@ -64,7 +64,7 @@
         <div class="network-value" [class]="getWifiClass(currentSystem.wifiRssi)">
           {{ currentSystem.wifiRssi }} dBm
         </div>
-        <div class="network-sub">{{ getWifiQuality(system()!.wifiRssi) }}</div>
+        <div class="network-sub">{{ getWifiQuality(currentSystem.wifiRssi) }}</div>
       </div>
     </div>
     <div class="network-item">

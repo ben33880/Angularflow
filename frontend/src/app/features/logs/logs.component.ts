@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, effect, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, effect, untracked, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
 import { NgIf, NgFor, DatePipe } from '@angular/common';
 import { MqttService } from '../../services/mqtt.service';
 import { CardComponent } from '../../shared/ui/card.component';
@@ -29,17 +29,17 @@ export class LogsComponent implements OnInit {
   constructor() {
     effect(() => {
       const log = this.mqtt.logsInfo$();
-      if (log) this.addLog(log);
+      if (log) untracked(() => this.addLog(log));
     });
     
     effect(() => {
       const log = this.mqtt.logsWarn$();
-      if (log) this.addLog(log);
+      if (log) untracked(() => this.addLog(log));
     });
     
     effect(() => {
       const log = this.mqtt.logsError$();
-      if (log) this.addLog(log);
+      if (log) untracked(() => this.addLog(log));
     });
   }
 

@@ -32,28 +32,28 @@ export class SystemComponent implements OnInit {
     
     effect(() => {
       const uptime = this.mqtt.systemUptime$();
-      if (uptime && this.systemSignal()) {
+      if (uptime) {
         this.systemSignal.update(s => s ? { ...s, uptime: uptime.uptime } : null);
       }
     });
     
     effect(() => {
       const memory = this.mqtt.systemMemory$();
-      if (memory && this.systemSignal()) {
+      if (memory) {
         this.systemSignal.update(s => s ? { ...s, freeMemory: memory.free, totalMemory: memory.total } : null);
       }
     });
     
     effect(() => {
       const wifi = this.mqtt.systemWifi$();
-      if (wifi && this.systemSignal()) {
+      if (wifi) {
         this.systemSignal.update(s => s ? { ...s, wifiRssi: wifi.rssi } : null);
       }
     });
     
     effect(() => {
       const mqtt = this.mqtt.systemMqtt$();
-      if (mqtt && this.systemSignal()) {
+      if (mqtt) {
         this.systemSignal.update(s => s ? { ...s, mqttConnected: mqtt.connected } : null);
       }
     });
